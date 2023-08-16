@@ -3,14 +3,12 @@
 m = 5;      % number of filtered points (FIR order)
 M = (m+1)/2;      % output point , M = (m+1)/2; % middle point for odd m
 n = 3;      % approximation polynomial order
-h = 1/sr; %sample period
-SG_coef = SG_calc(m,n,h); %compute coeffs for the sgolay differentiator
 handleNegPHI='interp'; % set strategy to adopt in intervals with negative frequency
 
 winLen=0.5;
 winStep=winLen/2;
 nMasks=16;
-exampleN=2;
+exampleN=3;
 switch exampleN
     case 1
 
@@ -47,14 +45,14 @@ switch exampleN
 
     case 2
         srAudio=16000;
-        srAmp=1000;
+        FSamp=1000;
         fileName='FR_F_AB4_2016_10_24_ModuleDiadoco_bababa';
         inTxtFile='textgrid_info_FR_GE.csv';
         spGroup=1;
         chunksXfile=1;
-        [AMsigs,AMt,srAmp]=getAmpSigs(fileName,inTxtFile,spGroup,chunksXfile);
+        [AMsigs,AMt,FSamp]=getAmpSigs(fileName,inTxtFile,spGroup,chunksXfile);
 
-        [PHI,PHIc,newPHI,newPHIc]=getPHImask(AMsigs(:,1),srAmp,m,n,winLen,winStep,nMasks,handleNegPHI);
+        [PHI,PHIc,newPHI,newPHIc]=getPHImask(AMsigs(:,1),FSamp,m,n,winLen,winStep,nMasks,handleNegPHI);
 
         figure
         b(1)=subplot(211);
@@ -69,7 +67,7 @@ switch exampleN
 
     case 3
         srAudio=16000;
-        srAmp=1000;
+        FSamp=1000;
 
         pathIn='C:\Users\lancia\Desktop\reading_corpora\output\ivie\c-text-f.wav';
         [signal,sr]=audioread(pathIn);
@@ -82,14 +80,14 @@ switch exampleN
         nshift=floor(winLenBPass/2);
         AMsig=abs(hilbert(zscore(signal)));
 
-        lpfilt =fir1(500,[1/(FSsig/2) (0.75*segRate)/(FSsig/2)]);
+        lpfilt =fir1(500,[1/(sr/2) (0.75*segRate)/(sr/2)]);
 
             AMsig=filter(lpfilt,1,AMsig);
             AMsig=sample_advance(AMsig, floor(500/2), 1e-7);
 
             % newCentFreq = findOptOScFreq2(AMsig,pars.FSamp,[],[pars.startT,pars.endT]);
 
-            AMsig=resample(AMsig,FSamp,FSsig);
+            AMsig=resample(AMsig,FSamp,sr);
 
 
             tAmp=[1:length(AMsig)]./FSamp;
@@ -110,7 +108,7 @@ switch exampleN
                 AMsigs(:,n) =AMfil;
              end
 
-        [PHI,PHIc,newPHI,newPHIc]=getPHImask(AMsigs(:,2),srAmp,m,n,winLen,winStep,nMasks,handleNegPHI);
+        [PHI,PHIc,newPHI,newPHIc]=getPHImask(AMsigs(:,2),FSamp,m,n,winLen,winStep,nMasks,handleNegPHI);
 
         figure
         b(1)=subplot(211);
