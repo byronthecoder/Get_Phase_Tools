@@ -1,5 +1,5 @@
 function [IMF,maskOmega]=mask_sift(x,maskOmega,maskAmpCoeff,nPhases,frqEst)
-
+ 
 if nargin<5 || isempty(frqEst)
     frqEst='ZC';
 end
