@@ -3,7 +3,6 @@ code to extract the continuous instantaneous phase of experimental signals accor
 
 ## content:
 
-Matlab version folders and files.  
 **get_phase** folder and its content: Matlab scripts implementing the methods proposed in [1].  
 **gen_utils** folder: Matlab scripts required to reproduce the analyses reported in [1].  
 **data** folder: files analysed in [1] and used to exemplify the method proposed there.  
