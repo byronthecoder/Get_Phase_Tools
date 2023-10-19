@@ -38,7 +38,7 @@ conda env update --name [envname] --file requirements.yml
 
 where **[envname]** should be substituted by the name of the environment where you want to use Get Phase Tools.
 
-#Usage: 
+# Usage: 
 The scripts are accessible via two main functions having the same names and arguments in both Matlab and Python implementations: **getPhaseMask** and **mEMDdenoise**.
 
 ## getPhaseMask
