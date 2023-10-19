@@ -1,0 +1,5 @@
+numpy>=1.25.0
+EMD-signal>=1.5.1
+scipy>=1.10.1
+stochastic>=0.6.0
+hurst>=0.0.5
