@@ -13,7 +13,7 @@
 
 clear all;
 
-exampleN=3; % select one example with an integer from 1 to 6
+exampleN=5; % select one example with an integer from 1 to 6
 
 addpath('./gen_utils');
 addpath(genpath('./get_phase')); 
@@ -258,13 +258,10 @@ switch exampleN
         
 	case 5 %EGG data
         
-        startFr=7408;% set relevant portion start and end points
-        endFr=9898; 
         sr=5000;% set new signal sr 
-        pathIn='./data/mamine_cont_2.wav';
+        pathIn='./data/eggSig.wav';
         [audioIn,oldSr]=audioread(pathIn);% load data
-        EGG=resample(audioIn(:,2),sr,oldSr);% resample at new sr
-        mySig=EGG(startFr:endFr);%extract relevant portion
+        mySig=resample(audioIn(:,2),sr,oldSr);% resample at new sr
         mySigT=[1:length(mySig)]./sr; % build time samples vector
                        
         options.MAXITERATIONS=10;% set maximum num of sifting iterations
@@ -311,8 +308,6 @@ switch exampleN
         end
         linkaxes(bb,'x')
         xlabel('Time (sec)')
-        
-        
         normSig=normalize_cycle_amp(imf(2,:)',[],[],5);%Refined normalization applied to second IMF from EMD
         PHI1=angle(hilbert(normSig)); % hilbert phase estimation 
 
@@ -321,15 +316,15 @@ switch exampleN
         axes(aa(1));
         plot(mySigT,mySig,'k'); %plot input signal
         set(gca,'xtick',[])
-        title('\textbf{Electroglottographic signal}','interpreter','latex')
+        title('\textbf{Electroglottographic signal}','interpreter','latex','fontsize',14)
         axes(aa(2))
         plot(mySigT,PHI,'k');% plot phase from our approach
         set(gca,'xtick',[])        
-        title('\textbf{Hilbert phase via the proposed method}','interpreter','latex')
+        title('\textbf{Hilbert phase via the proposed method}','interpreter','latex','fontsize',14)
         axes(aa(3))
         plotMe=wrapTo2Pi(unwrap(PHI1));
         plot(mySigT,plotMe,'k');% plot phase from the approach in Huang et al. (2009)
-        title('\textbf{Hilbert phase via the method in [5]}','interpreter','latex')
+        title('\textbf{Hilbert phase via the method in [5]}','interpreter','latex','fontsize',14)
         linkaxes(aa,'x')
         xlabel('Time (sec)')
 end
