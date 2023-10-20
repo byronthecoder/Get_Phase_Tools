@@ -13,7 +13,7 @@
 
 clear all;
 
-exampleN=4; % select one example with an integer from 1 to 6
+exampleN=3; % select one example with an integer from 1 to 6
 
 addpath('./gen_utils');
 addpath(genpath('./get_phase')); 
@@ -170,7 +170,7 @@ switch exampleN
             sigsIn(:,nDim)=dataIn.data(:,artDimN(nDim));% get sensor data
             sr=dataIn.samplerate;% sampling rate
             sigInT=[1:size(sigsIn,1)]./sr; % time steps
-            [filtereds(:,nDim),imf,imfF,filteredidx{nDim},noiseStd]=mEMDdeNoise(sigsIn(:,nDim),sr,nMasks,2,0.05,nRandNoiseRep,m,n);
+            [filtereds(:,nDim),imf,imfF,filteredidx{nDim},noiseStd]=mEMDdenoise(sigsIn(:,nDim),sr,nMasks,2,0.05,nRandNoiseRep,m,n);
 
             [PHI,~,~,~,~]=getPHImask(filtereds(:,nDim),sr,m,n,nMasks,ampCoeff,phaseMethod,threshs);
             newPHIs(:,nDim)=PHI;
