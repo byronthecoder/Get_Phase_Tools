@@ -45,7 +45,7 @@ if nargin<7 || isempty(quadMethod)
     quadMethod={'h','h'};
 elseif iscell(quadMethod) && length(quadMethod)==1
     quadMethod={quadMethod{1},quadMethod{1}};
-elseif isstring(quadMethod)
+elseif ischar(quadMethod)
     quadMethod={quadMethod,quadMethod};
 end
 if nargin<8 || isempty(threshs)
