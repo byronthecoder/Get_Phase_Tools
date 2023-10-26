@@ -53,7 +53,7 @@ if nargin<2 || isempty(maskOmega) || (length(maskOmega)==1 && maskOmega==0)
         Ifreq=diff(unwrap(IPH));         
         IPH(Ifreq<0)=NaN;
         maskOmega=nanmean(diff(unwrap(IPH))/(2*pi));%normalized freq      
-    elseif length(maskOmega)==1 % if frequency is to be estimated via reciprocal of zero-crossing distance
+    else if frequency is to be estimated via reciprocal of zero-crossing distance
          zci = @(v) find(v(:).*circshift(v(:), [-1 0]) <= 0);
          maskOmega=ceil(length(zci(IMF0))/2)/length(IMF0);%normalized freq
     end
