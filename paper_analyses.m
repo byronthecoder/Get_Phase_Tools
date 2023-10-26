@@ -13,7 +13,7 @@
 
 clear all;
 
-exampleN=5; % select one example with an integer from 1 to 6
+exampleN=3; % select one example with an integer from 1 to 6
 
 addpath('./gen_utils');
 addpath(genpath('./get_phase')); 
@@ -45,7 +45,7 @@ switch exampleN
         Decomp=emd(sig,options)'; % get classic decomposition
 
         [PHI,newIMF,PHI0,centSig,mask]=getPHImask(sig,sr,m,n,nMasks,ampCoeff,phaseMethod,threshs);
- 
+        figure
         axx=tight_subplot(4,2,0.04,0.08); %initialize subplots
         
         axes(axx(1));
