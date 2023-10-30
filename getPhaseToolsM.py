@@ -41,7 +41,7 @@ def normalize_cycle_amp(sig,symmetric=1,threshNorm=1e-10,maxIterN=5,symN=2):
         emdObj = EMDm.EMD()
         emdObj.MAX_ITERATION=2
         emdObj.FIXE = 1
-        normSig=emdObj.emd(normSig)[0]
+        normSig=emdObj.emd(normSig,maxImf=2)[0]
         # normSig,_=emd.sift.get_next_imf(normSig,
         #         stop_method='rilling',max_iters=1000)
         #tmpIMFs=emdObj(resid+m[:, nn])
@@ -118,7 +118,7 @@ def do_mask_sift(resid,CF=None,nMasks=4,ampCoeff=None,frqEst='phi',emdObj=None):
         emdObj1 = EMDm.EMD()
         emdObj1.MAX_ITERATION=1
         
-        IMF0=emdObj1.emd(resid)[0][0]
+        IMF0=emdObj1.emd(resid,maxImf=2)[0][0]
         IMF0=normalize_cycle_amp(IMF0) # refined amplitude normalization
         if frqEst=='phi':           # if frequency is to be estimated via phase derivative
             IPH=np.angle(signal.hilbert(IMF0)) # phase
@@ -143,7 +143,7 @@ def do_mask_sift(resid,CF=None,nMasks=4,ampCoeff=None,frqEst='phi',emdObj=None):
     for nn in np.arange(nMasks):
         # tmpIMFs,_=emd.sift.get_next_imf(resid+m[:, nn],
         #         stop_method='rilling', rilling_thresh=[0.05,0.5,0.05],max_iters=1000)
-        tmpIMFs=emdObj.emd(resid+m[:, nn])[0]
+        tmpIMFs=emdObj.emd(resid+m[:, nn],maxImf=2)[0]
         IMFs[:,nn]=tmpIMFs[0]#[:,0]#
         
     return np.sum(IMFs - m,axis=1)/nMasks, CF, m[:, 0]
@@ -271,7 +271,7 @@ def maskEMD(sigIn,sr, maxIMFn=10,nMasks=22,ampCoeff=2,m=16,n=5,stdRatioThresh=1e
     while nPks>0 and nn <maxIMFn-1 and stdRatio>stdRatioThresh:
         
 
-        myMode=emdObj.emd(resid)[0]
+        myMode=emdObj.emd(resid,maxImf=2)[0]
         # myMode,_=emd.sift.get_next_imf(resid,
         #         stop_method='fixed', max_iters=1)
         myMode=myMode[0]#[:,0]
@@ -366,7 +366,7 @@ def mEMDdenoise(data,sr,nMasks=22,ampCoeff=2,alpha=0.05,nReps=100,m=16,n=5):
     
     
     for i in np.arange(np.shape(noiseLev)[0]):
-       rndImfs=emdObj.emd(f[:,i])[0]# apply EMD
+       rndImfs=emdObj.emd(f[:,i],maxImf=2)[0]# apply EMD
        rndImfsArr=np.empty((np.size(rndImfs[0]),len(rndImfs)))# need to transform the dictionary into an array
        for h in rndImfs.keys():
            rndImfsArr[:,h]=rndImfs[h]
@@ -430,8 +430,8 @@ def getPhaseMask(sigIn,sr,m=5,n=3,nMasks=8,ampCoeff=2, quadMethod=['h','h'], thr
     emdObj = EMDm.EMD()
     emdObj.MAX_ITERATION=2
     emdObj.FIXE = 1
-    IMF0,_,_,_=emdObj.emd(sigIn)
-    #[0]
+    IMF0=emdObj.emd(sigIn,maxImf=2)[0]
+    #
     # IMF0,_=emd.sift.get_next_imf(sigIn,
     #          stop_method='fixed', max_iters=1)
     IMF0=IMF0[0]#[:,0]
