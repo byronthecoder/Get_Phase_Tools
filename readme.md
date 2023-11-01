@@ -64,8 +64,8 @@ The function removes high frequency noise from an input signal given its samplin
 Its first argument is the input signal and its second argument the sampling frequency. The other (optional) arguments are:  
 
 **nMasks** (positive integer; optional, default: 22): number of mask signal for masked EMD application .  
-**ampCoeff**(positive real; optional, default: 2*estimated range of first IMF): amplitude of the mask signals .  
-**nReps**(positive integer; optional, default: 100): number of repetitions of simulated random processes .  
+**ampCoeff** (positive real; optional, default: 2*estimated range of first IMF): amplitude of the mask signals .  
+**nReps** (positive integer; optional, default: 100): number of repetitions of simulated random processes .  
 **m** (positive integer; optional, default: 16): length of the Savitzky-Golay differentiator.  
 **n** (positive integer; optional, default: 5): order of the Savitzky-Golay differentiator.
 
