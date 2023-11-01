@@ -1,24 +1,24 @@
 function sigIn=normalize_cycle_amp(sigIn,symmetric,threshNorm,maxIterN, symN)
-%    normalize envelope peaks iteratively following a modified version of Huang et al. (2009) 
-%    (preventing the occurrence of local extrema smaller than 1 and larger than -1) and using pchip
-%     interpolation to obtain the envelope connecting the abs. values of local extrema.
-%    Boundary conditions of the local maxima sequence are computed following 
-%    Rilling 2007 (see function in '.\utils\boundary_conditions.m').
+%    demodulate envelope peaks iteratively and using pchip interpolation.
+%    At each iteration, max and min are individuated, their absolute values are 
+%    interpolated to obtain an envelope. The signal is then divided by the envelope.
+%    If even one peak of the obtained signal is larger than 0, this is sent to a new iteration.
+%    Otherwise the procedure is stopped. Boundary conditions of the local extrema sequence 
+%    are computed following Rilling 2007 (see function in '.\utils\boundary_conditions.m').
 %
-%     input:
-%         symmetric (default: 1) : if it is 0 we compute the signal minimum and maximum envelopes by 
-%         interpolating the local low and high extrema. The mean of these two envelopes 
-%         is also computed and it is subtracted by the signal 
+%    input:
+%    
+%    symmetric (binary, optional): if it is 0 the signal's cycles are not centered around 0. 
+%           This is solved by applying one iteration of sifting.
+%    threshNorm (positive real, optional): threshold to determine if peaks are different from 1/-1
+%    maxIterN (positive integer, optional): maximum number of iterations
+%    symN (positive integer, optional): number of extrtema to be added at the beginning and at the
+%           end to regularize boundary conditions before interpolation.
+%
+%    output:
 %     
-%         threshNorm: threshold to determine if peaks are different from 1/-1
-%         maxIterN: maximum number of iterations
-%         symN: number of extrtema to be added at the beginning and at the
-%               end before interpolating.
-%     output:
-%         normalized envelope
-% 
-%         sigIn=copy.copy(sig)
-% 
+%    normalized envelope
+%    sigIn=copy.copy(sig)
 
 % Leonardo Lancia 14/10/2023
 % mailto: leonardo.lancia@cnrs.fr

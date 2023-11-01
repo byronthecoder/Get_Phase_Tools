@@ -4,17 +4,18 @@ function [outIMFs,IMFfreqs]=maskEMD(signal,sr, maxIMFn,nMasks,ampCoeff,m,n,stdRa
 % input:
 
 % signal: input signal
-% sr: sampling frequency in Hz
-% maxIMFn: maximum number of IMFs (if not provided or equal to 0, the procedure 
-%       will be stopped when the obtained IMF contains no extrema).
-% nMasks: number of mask signal used in sifting (optional, default=4)
-% ampCoeff: amplitude of the mask signals used for sifting (optional,
-%       default= twice the range of the signal sent to masked sifting). Non
-%       default values are meant to be used in denoising application.
-% m: length of the Savitzky-Golay differentiator
-% n: order of the Savitzky-Golay differentiator
-% stdRatioThresh: threshold for the ration between the standard deviation of a residual
-%       and that of the following IMF
+% sr: (positive real): sampling frequency in Hz
+% maxIMFn: maxIMFn (positive integer; optional, default=10): maximum number of IMFs.
+%         If equal to 0, the procedure will be stopped when the obtained 
+%         IMF contains no extrema.
+% nMasks (positive integer; optional, default= 22 ): number of mask signal used in sifting 
+% ampCoeff (positive real; optional, default=2): coefficient determining the amplitude of the masks as a
+%            proportion of 4*std(signal), which is meant to be a rough estimate of the signal's 
+%            range from the std if the signal's values are normally distributed.
+% m (positive integer; optional, default= 16): length of the Savitzky-Golay differentiator.  
+% n (positive integer; optional, default= 5): order of the Savitzky-Golay differentiator.  
+% stdRatioThresh (positive real; optional, default= 1E-6): threshold for EMD convergence
+
 % 
 % output:
 % outIMFs: the extracted IMFs
@@ -26,16 +27,16 @@ if nargin<3 || isempty(maxIMFn) || isnan(maxIMFn) || maxIMFn==0 %initialize maxI
     maxIMFn=Inf;
 end
 if nargin<4 || isempty(nMasks) || isnan(nMasks)  || nMasks==0 %initialize nMasks
-    nMasks=4;
+    nMasks=22;
 end
 if nargin<5 || isempty(ampCoeff) || isnan(ampCoeff)  || ampCoeff==0 %initialize ampCoeff
     ampCoeff=[];
 end
 if nargin<6 || isempty(m) || isnan(m)  || m==0 %initialize m
-    m=5;
+    m=16;
 end
 if nargin<7 || isempty(n) || isnan(n)  || n==0 %initialize n
-    n=3;
+    n=5;
 end
 if nargin<8 || isempty(stdRatioThresh)
     stdRatioThresh=1e-6;

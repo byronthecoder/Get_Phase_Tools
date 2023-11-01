@@ -2,13 +2,14 @@ function [filtered,imf,imfF,filteredidx,noiseStd]=mEMDdeNoise(data,sr,nMasks,amp
 % remove noise from signal in Data sampled at freq. sr 
 % input:
 %
-%       data: input signal
-%       sr: sampling rate
-%       nMasks(positive integer; optional, default: 8): number of mask signal for masked EMD application .  
-%       ampCoeff(positive real; optional, default: 2*estimated range of first IMF): amplitude of the mask signals .  
-%       nReps(positive integer; optional, default: 100): number of repetitions of simulated random processes .  
-%       m (positive integer; optional, default: 16): length of the Savitzky-Golay differentiator.  
-%       n (positive integer; optional, default: 5): order of the Savitzky-Golay differentiator.  
+% data: input signal
+% sr: sampling rate
+% nMasks(positive integer; optional, default: 8): number of mask signal for masked EMD application .  
+% ampCoeff (positive real; optional, default: 2): amplitude gain of the mask signals 
+%       (it is multiplied by 4sd(IMF1), where IMF1 is the first IMF or the centered data at the first iteration ).  
+% nReps(positive integer; optional, default: 100): number of repetitions of simulated random processes .  
+% m (positive integer; optional, default: 16): length of the Savitzky-Golay differentiator.  
+% n (positive integer; optional, default: 5): order of the Savitzky-Golay differentiator.  
 
 %
 % output:

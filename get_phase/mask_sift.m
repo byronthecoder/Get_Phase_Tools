@@ -5,16 +5,18 @@ function [IMF,maskOmega,mask]=mask_sift(x,maskOmega,frqEst,nPhases,maskAmpCoeff)
 
 %input: 
 %       x: input signal
-%       maskOmega: mask signals frequency in radians per sample (optional).
-%               If not provided, empty or equal to zero the mask frequency  
+%       maskOmega (positive real; optional, by default it is computed from the signal): 
+%               mask signals frequency in radians per sample (optional).
+%               If not provided, empty or equal to zero, the mask frequency  
 %               is computed with the method defined by the third argument
-%       frqEst: frequency estimation method (optional, default 'phi'). If 'phi' the phase 
-%               is computed and the frequency is obtained from its median derivative 
-%               Otherwise the frequency is computed as the reciprocal of the median 
+%       frqEst (string among 'phi' and 'zc', optional, default 'phi')frequency estimation method . 
+%               If 'phi' the phase is computed and the frequency is obtained from its median
+%               derivative. Otherwise the frequency is computed as the reciprocal of the median 
 %               distance between consecutive in time zero crossing points
-%       nPhases: number of masking signals used (optional, default = 4)
-%       maskAmpCoeff: maski signal amplitude (optional, default=2*4*std(x) as 4*std(x) 
-%               is a rough estimate of the range of x when this is normallly distributed)
+%       nPhases (positive integer, optional, default = 22) number of masking signals used 
+%       maskAmpCoeff (optional, default=2): coefficient determining the amplitude of the masks as a
+%            proportion of 4*std(signal), which is meant to be a rough estimate of the signal's 
+%            range from the std if the signal's values are normally distributed.
 %
 %output:
 %      IMF: sifted signal
@@ -32,7 +34,7 @@ if nargin<3 || isempty(frqEst) % initialize freq. estimation method
 end
 
 if nargin<4 || isempty(nPhases) % initialize num of mask signals
-    nPhases=4;
+    nPhases=22;
 end
 
 if nargin<5 || isempty(maskAmpCoeff) % initialize mask amplitude
@@ -53,7 +55,7 @@ if nargin<2 || isempty(maskOmega) || (length(maskOmega)==1 && maskOmega==0)
         Ifreq=diff(unwrap(IPH));         
         IPH(Ifreq<0)=NaN;
         maskOmega=nanmean(diff(unwrap(IPH))/(2*pi));%normalized freq      
-    else if frequency is to be estimated via reciprocal of zero-crossing distance
+    elseif strcmp(frqEst,'zc')% if frequency is to be estimated via reciprocal of zero-crossing distance
          zci = @(v) find(v(:).*circshift(v(:), [-1 0]) <= 0);
          maskOmega=ceil(length(zci(IMF0))/2)/length(IMF0);%normalized freq
     end

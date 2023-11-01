@@ -21,7 +21,7 @@ In order to use the proposed methods in you own workflow you need to add the fol
 
 addpath(genpath('./get_phase'))
 
-This is not required when launching the demo.mlx file from the folder containing **get_phase** and **data** or the script **paper_analyses.m** from the folder containing **get_phase** gen_utils and **data**.
+This is not required when launching the demo.mlx file from the folder containing **get_phase** and **data** or the script **paper_analyses.m** from the folder containing **get_phase**, **gen_utils** and **data**.
  
 
 ## Python:  
@@ -46,10 +46,10 @@ This function computes the instantaneous phase of an input signal given its samp
 Its first argument is the input signal and its second argument the sampling frequency. The following optional arguments are:  
 **m**: (positive integer; optional, default: 16) number of filtered points for Savitzky-Golay differentiator.  
 **n**: (positive integer; optional, default: 5) polinomial order of the differentiator.  
-**nMasks**: (positive integer; optional, default 8)number of masks used to extract the independent mode function via masked EMD.  
+**nMasks**: (positive integer; optional, default 22)number of masks used to extract the independent mode function via masked EMD.  
 **ampCoeff**:(positive real; optional, default: 2) coefficient determining the amplitude of the masks as a proportion of 4*std(signal) (as this is a rough estimate of the signal's range from the std if the signal's values are normally distributed).  
-**quadMethod**: (a string or a cell of two strings, default: 'h'). MEthod to be use in the computation of the quadrature signal 'h' stands for Hilbert and 'q'. If two strings are provided a different method will be adopted in in the first or the second part of the algorithm.  
-**threshs**:(scalar or vector of two positive real values close to zero, default: 1E-10): threshold for refined amplitude normalization. If two values, different thresholds will be used in the two parts of the algorithm.  
+**quadMethod**: (a string or a cell of two strings in Matlab and a string or a list of two strings in Python, default: {'h','h'} in Matlab and ['h','h'] ). Method to be use in the computation of the quadrature signal 'h' stands for Hilbert and 'q'. If two strings are provided a different method will be adopted in in the first or the second part of the algorithm.  
+**threshs**:(scalar or vector of two positive real values close to zero, default: [1E-10,1E-10]  ): threshold for refined amplitude normalization. If two values, different thresholds will be used in the two parts of the algorithm.  
 
 The function's outputs are:  
 **PHI**: sthe signal's phase.  
@@ -61,9 +61,9 @@ The function's outputs are:
 
 ## mEMDdeNoise
 The function removes high frequency noise from an input signal given its sampling frequency.
-Its first argument is the input signal and its second argument the sampling frequency. The following optional arguments are:  
+Its first argument is the input signal and its second argument the sampling frequency. The other (optional) arguments are:  
 
-**nMasks** (positive integer; optional, default: 8): number of mask signal for masked EMD application .  
+**nMasks** (positive integer; optional, default: 22): number of mask signal for masked EMD application .  
 **ampCoeff**(positive real; optional, default: 2*estimated range of first IMF): amplitude of the mask signals .  
 **nReps**(positive integer; optional, default: 100): number of repetitions of simulated random processes .  
 **m** (positive integer; optional, default: 16): length of the Savitzky-Golay differentiator.  

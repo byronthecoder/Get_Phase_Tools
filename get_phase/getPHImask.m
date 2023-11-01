@@ -4,15 +4,15 @@ function [newPHI,IMF1,PHI,centeredSig,mask ]=getPHImask(signal,sr,m,n,nMasks,amp
 % sr: (positive integer) sampling rate
 % m: (positive integer; optional, default: 16) number of filtered points for Savitzky-Golay differentiator 
 % n: (positive integer; optional, default: 5) polinomial order of the differentiator
-% nMasks: (positive integer; optional, default 8)number of masks used to extract the independent mode function via masked EMD
+% nMasks: (positive integer; optional, default 22)number of masks used to extract the independent mode function via masked EMD
 % ampCoeff:(positive real; optional, default: 2) coefficient determining the amplitude of the masks as a
-%            proportion of 4*std(signal) (as this is a rough estimate of the signal's 
-%           range from the std if the signal's values are normally distributed)
-% quadMethod: (a string or a cell of two strings, default: 'h'). MEthod to be use in the 
+%            proportion of 4*std(signal), which is meant to be a rough estimate of the signal's 
+%           range from the std if the signal's values are normally distributed.
+% quadMethod: (a string or a cell of two strings, default: {'h','h'}). MEthod to be use in the 
 %            computation of the quadrature signal 'h' stands for Hilbert and 'q'. 
 %            If two strings are provided a different method will be adopted in in the first 
 %            or the second part of the algorithm.
-% threshs:(scalar or vector of two positive real values close to zero, default: 1E-10) threshold for refined 
+% threshs:(scalar or vector of two positive real values close to zero, default: [1E-10, 1E-10]) threshold for refined 
 %          amplitude normalization. If to values, different thresholds will be used in the two parts 
 %          of the algorithm.
 
@@ -91,12 +91,11 @@ end
 IMF=normalize_cycle_amp(IMF1,[],threshs(2),5);%refined amplitude normalizatin algo
 
 if strcmpi(quadMethod{2},'q')
-    newPHI=quadAngle(IMF,0); % direct quadrature phase estimation 
+	newPHI=quadAngle(IMF,0); % direct quadrature phase estimation 
 elseif strcmpi(quadMethod{2},'hq')
     newPHI=quadAngle(IMF,1); % hilbert quadrature phase estimation 
 elseif strcmpi(quadMethod{2},'h')
     newPHI=wrapTo2Pi(unwrap(angle(hilbert(IMF)))); % hilbert  estimation 
-%     [~,newPHI,~]=IFOC(IMF',500);
 else
     error('quadMethod can only be ''q'',''h'' or ''hq''')
 end

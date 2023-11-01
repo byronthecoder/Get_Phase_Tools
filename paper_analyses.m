@@ -13,7 +13,7 @@
 
 clear all;
 
-exampleN=3; % select one example with an integer from 1 to 6
+exampleN=1; % select one example with an integer from 1 to 6
 
 addpath('./gen_utils');
 addpath(genpath('./get_phase')); 

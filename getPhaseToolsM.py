@@ -17,7 +17,7 @@ from hurst import compute_Hc
 
 def normalize_cycle_amp(sig,symmetric=1,threshNorm=1e-10,maxIterN=5,symN=2):
     """
-    normalize envelope peaks iteratively and using pchip interpolation.
+    demodulate envelope peaks iteratively and using pchip interpolation.
     At each iteration, max and min are individuated, their absolute values are 
     interpolated to obtain an envelope. The signal is then divided by the envelope.
     If even one peak of the obtained signal is larger than 0, this is sent to a new iteration.
@@ -25,14 +25,14 @@ def normalize_cycle_amp(sig,symmetric=1,threshNorm=1e-10,maxIterN=5,symN=2):
     
     input:
         sig: input signal
-        symmetric (binary, optional) : if it is 0 the signal's cycles are not centered around 0. 
+        symmetric (binary, optional): if it is 0 the signal's cycles are not centered around 0. 
             This is solved by applying one iteration of sifting.
-        threshNorm(positive real, optional) : threshold to determine if peaks are different from 1/-1
-        maxIterN(positive integer, optional) : maximum number of iterations
-        symN(positive integer, optional) : number of extrtema to be added at the beginning and at the
+        threshNorm (positive real, optional): threshold to determine if peaks are different from 1/-1
+        maxIterN (positive integer, optional): maximum number of iterations
+        symN (positive integer, optional): number of extrtema to be added at the beginning and at the
               end to regularize boundary conditions before interpolation.
     output:
-        normalized envelope
+        demodulated signal
     """
     normSig=copy.copy(sig)
 
@@ -241,16 +241,17 @@ def maskEMD(sigIn,sr, maxIMFn=10,nMasks=22,ampCoeff=2,m=16,n=5,stdRatioThresh=1e
     
     input:
          signal: input signal
-         sr: sampling frequency in Hz
-         maxIMFn: maximum number of IMFs (if not provided or equal to 0, the procedure 
-                will be stopped when the obtained IMF contains no extrema).
-         nMasks: number of mask signal used in sifting (optional, default=4)
-         ampCoeff: amplitude of the mask signals used for sifting (optional,
-                default= twice the range of the signal sent to masked sifting). Non
-                default values are meant to be used in denoising application.
-         m: (positive integer; optional, default: 16): length of the Savitzky-Golay differentiator.  
-         n: (positive integer; optional, default: 5): order of the Savitzky-Golay differentiator.  
-         stdRatioThresh (positive real; optional, default:1E-6): threshold for EMD convergence
+         sr (positive real): sampling frequency in Hz
+         maxIMFn (positive integer; optional, default=10): maximum number of IMFs
+         if equal to 0, the procedure will be stopped when the obtained 
+         IMF contains no extrema.
+         nMasks (positive integer; optional, default= 22 ): number of mask signal used in sifting 
+         ampCoeff ( positive real, optional, default= 2): coefficient determining the amplitude of the masks as a
+                proportion of 4*std(signal), which is meant to be a rough estimate of the signal's 
+                range from the std if the signal's values are normally distributed.
+         m (positive integer; optional, default= 16): length of the Savitzky-Golay differentiator.  
+         n (positive integer; optional, default= 5): order of the Savitzky-Golay differentiator.  
+         stdRatioThresh (positive real; optional, default= 1E-6): threshold for EMD convergence
     output:
         outIMFs: the extracted IMFs
         IMFfreqs: the estimated frequencies of the extracted IMFs 
@@ -320,12 +321,13 @@ def mEMDdenoise(data,sr,nMasks=22,ampCoeff=2,alpha=0.05,nReps=100,m=16,n=5):
     remove noise from signal in Data sampled at freq. sr 
     input:
        data: input signal
-       sr: sampling rate
-       nMasks: (positive integer; optional, default: 8): number of mask signal for masked EMD application .  
-       ampCoeff: (positive real; optional, default: 2*estimated range of first IMF): amplitude of the mask signals .  
-       nReps: (positive integer; optional, default: 100): number of repetitions of simulated random processes .  
-       m: (positive integer; optional, default: 16): length of the Savitzky-Golay differentiator.  
-       n: (positive integer; optional, default: 5): order of the Savitzky-Golay differentiator.  
+       sr (positive real): sampling rate
+       nMasks (positive integer; optional, default: 22): number of mask signal for masked EMD application .  
+       ampCoeff (positive real; optional, default: 2): amplitude gain of the mask signals 
+           (it is multiplied by 4sd(IMF1), where IMF1 is the first IMF or the centered data at the first iteration ).  
+       nReps (positive integer; optional, default: 100): number of repetitions of simulated random processes .  
+       m (positive integer; optional, default: 16): length of the Savitzky-Golay differentiator.  
+       n (positive integer; optional, default: 5): order of the Savitzky-Golay differentiator.  
 
     output:
        filtered: filtered signal
@@ -394,7 +396,7 @@ def mEMDdenoise(data,sr,nMasks=22,ampCoeff=2,alpha=0.05,nReps=100,m=16,n=5):
     return filtered, imf, imfF, filteredidxs, noiseStd
 
     
-def getPhaseMask(sigIn,sr,m=5,n=3,nMasks=8,ampCoeff=2, quadMethod=['h','h'], threshs=[1e-10,1e-10]):
+def getPhaseMask(sigIn,sr,m=16,n=5,nMasks=22,ampCoeff=2, quadMethod=['h','h'], threshs=[1e-10,1e-10]):
     """
    performs EMD via Masked Sifting
     input: 
@@ -402,18 +404,18 @@ def getPhaseMask(sigIn,sr,m=5,n=3,nMasks=8,ampCoeff=2, quadMethod=['h','h'], thr
         sr: sampling rate
         m (positive integer; optional, default: 16): number of filtered points for Savitzky-Golay differentiator 
         n (positive integer; optional, default: 5): polinomial order of the differentiator
-        nMasks (positive integer; optional, default: 8): number of masks used to extract the independent mode function via masked EMD
+        nMasks (positive integer; optional, default: 22): number of masks used to extract the independent mode function via masked EMD
         ampCoeff (positive real; optional, default: 2): amplitude of the mask signals used for sifting (optional,
                  default= twice a rough estimate of the range of the signal sent to 
                  masked sifting). Non default values are meant to be used in denoising 
                  applications.
-        quadMethod (a string or a cell of two strings, default: 'h'). Method to be used in the
+        quadMethod (a string or a cell of two strings, default: ['h','h']). Method to be used in the
                 computation of the quadrature signal 'h' stands for Hilbert and 'q'. If two 
-                strings are provided a different method will be adopted in in the first or 
+                strings are provided a different method can be adopted in in the first or 
                 the second part of the algorithm.  
-        threshs (scalar or vector of two positive real values close to zero, default: 1E-10):
+        threshs (scalar or vector of two positive real values close to zero, default: [1E-10,1E-10]):
             threshold for refined amplitude normalization. If two values, different thresholds
-            will be used in the two parts of the algorithm.  
+            can be used in the two parts of the algorithm.  
     output:
         PHI: instantaneous phase
         IMF: signal obtained from Masked Sifting
