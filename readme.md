@@ -53,9 +53,9 @@ Its first argument is the input signal and its second argument the sampling freq
 
 The function's outputs are:  
 **PHI**: sthe signal's phase.  
-**IMF1**: output of masked sifting
-**PHI**: initial phase estimte
-**centredSig**: centred signal,
+**IMF1**: output of masked sifting.  
+**PHI**: initial phase estimte.  
+**centredSig**: centred signal.  
 **mask**: masking signal with inital phase set to 0
 
 
