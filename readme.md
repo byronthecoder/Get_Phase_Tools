@@ -83,3 +83,7 @@ the function's outputs are:
 **imfF**: frequencies of extracted IMFs.  
 **filteredidx**: indexes of IMFs composing the filtered signal.  
 **noiseStd**: standard deviation of the estimated noise (sum of the random components).
+
+## Copyright
+
+this code is licensed under the GNU-GPL. If you use it, you have to refer to the companion paper avialable here: https://doi.org/10.1101/2023.11.01.564135
