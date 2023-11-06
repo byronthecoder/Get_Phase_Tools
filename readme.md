@@ -86,4 +86,4 @@ the function's outputs are:
 
 ## Copyright
 
-this code is licensed under the GNU-GPL. If you use it, you have to refer to the companion paper avialable here: https://doi.org/10.1101/2023.11.01.564135
+This code is licensed under the GNU-GPL (see LICENSE file). If you use it, you have to refer to the companion paper avialable here: https://doi.org/10.1101/2023.11.01.564135
