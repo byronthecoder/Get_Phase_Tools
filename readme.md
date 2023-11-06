@@ -1,11 +1,11 @@
 # Get Phase Tools
-code to extract the continuous instantaneous phase of experimental signals according to the paper: 
+Code to extract the continuous instantaneous phase of experimental signals according to the paper: 
 
 Instantaneous phase of rhythmic behaviour under volitional control  
 Leonardo Lancia  
 bioRxiv 2023.11.01.564135; doi: https://doi.org/10.1101/2023.11.01.564135
 
-## content:
+## Content:
 
 **get_phase** folder and its content: Matlab scripts implementing the methods proposed.  
 **gen_utils** folder: Matlab functions required to reproduce the analyses reported in the paper.  
@@ -44,7 +44,9 @@ conda env update --name [envname] --file requirements.yml
 where **[envname]** should be substituted by the name of the environment where you want to use Get Phase Tools.
 
 # Usage: 
-The scripts are accessible via two main functions having the same names and arguments in both Matlab and Python implementations: **getPhaseMask** and **mEMDdenoise**.
+The scripts are accessible via two main functions having the same names and arguments in both Matlab and Python implementations: 
+**getPhaseMask** and **mEMDdenoise**. Their functioning is illustrated by the two demo files **paper_example_application.mlx** (Matlab Live Editor)
+and **paper_example_application.ipynb** (Python Jupyter notebook).
 
 ## getPhaseMask
 This function computes the instantaneous phase of an input signal given its sampling frequency.
