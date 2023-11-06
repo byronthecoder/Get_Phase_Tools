@@ -1,14 +1,19 @@
 # Get Phase Tools
-code to extract the continuous instantaneous phase of experimental signals according to [1]
+code to extract the continuous instantaneous phase of experimental signals according to the paper: 
+
+Instantaneous phase of rhythmic behaviour under volitional control
+Leonardo Lancia
+bioRxiv 2023.11.01.564135; doi: https://doi.org/10.1101/2023.11.01.564135
 
 ## content:
 
-**get_phase** folder and its content: Matlab scripts implementing the methods proposed in [1].  
-**gen_utils** folder: Matlab scripts required to reproduce the analyses reported in [1].  
-**data** folder: files analysed in [1] and used to exemplify the method proposed there.  
-**demo.mlx** file: demo file illustrating the functioning of the matlab functions.  
-**paper_analyses.m** file: Matlab script to launch the analyses reported in [1].  
-**getPhaseToolsM.py** file: Python functions implementing the methods proposed in [1].  
+**get_phase** folder and its content: Matlab scripts implementing the methods proposed.  
+**gen_utils** folder: Matlab functions required to reproduce the analyses reported in the paper.  
+**data** folder: files analysed in the paper and used to exemplify the method proposed there.  
+**demo.mlx** file: Matlab Live Script demo file illustrating the functioning of the matlab functions.  
+**paper_analyses.m** file: Matlab script to launch the analyses reported in the paper.  
+**getPhaseToolsM.py** file: Python functions implementing the methods proposed.  
+**paper_example_application.ipynb** file: Jupyter notebook demo file illustrating the functioning of the Python functions.
 **requirements.txt** file: requirement file to install Python dependencies via PIP.  
 **requirements.yml** file: requirement file to install Python dependencies via conda.  
 
@@ -25,7 +30,7 @@ This is not required when launching the demo.mlx file from the folder containing
  
 
 ## Python:  
-To install the modules required for the functioning og the methods proposed in [1]
+To install the modules required for the functioning og the methods proposed in the paper
 go in the directory containitng the files **requirements.txt** and **requirements.yml**
 
 type 
