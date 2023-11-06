@@ -366,9 +366,8 @@ def mEMDdenoise(data,sr,nMasks=22,ampCoeff=2,alpha=0.05,nReps=100,m=16,n=5):
     emdObj.MAX_ITERATION=nImf
     #emdObj.FIXE = nImf-1
     
-    
     for i in np.arange(np.shape(noiseLev)[0]):
-       rndImfs=emdObj.emd(f[:,i],maxImf=2)[0]# apply EMD
+       rndImfs=emdObj.emd(f[:,i])[0]# apply EMD
        rndImfsArr=np.empty((np.size(rndImfs[0]),len(rndImfs)))# need to transform the dictionary into an array
        for h in rndImfs.keys():
            rndImfsArr[:,h]=rndImfs[h]
@@ -454,7 +453,9 @@ def getPhaseMask(sigIn,sr,m=16,n=5,nMasks=22,ampCoeff=2, quadMethod=['h','h'], t
     
     if ampCoeff is not None:
         ampCoeff=ampCoeff*4*np.std(sigIn)
-        
+    
+    emdObj.MAX_ITERATION=10
+ 
     IMF1,_,mask=do_mask_sift(sigIn, sigFreq,nMasks,ampCoeff,emdObj)#get signal via masked sifting
     
     IMF=normalize_cycle_amp(IMF1); #refined amplitude normalization
