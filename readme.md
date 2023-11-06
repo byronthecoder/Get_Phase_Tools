@@ -1,8 +1,8 @@
 # Get Phase Tools
 code to extract the continuous instantaneous phase of experimental signals according to the paper: 
 
-Instantaneous phase of rhythmic behaviour under volitional control
-Leonardo Lancia
+Instantaneous phase of rhythmic behaviour under volitional control  
+Leonardo Lancia  
 bioRxiv 2023.11.01.564135; doi: https://doi.org/10.1101/2023.11.01.564135
 
 ## content:
