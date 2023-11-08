@@ -33,7 +33,7 @@ This is not required when running demo.mlx from the location containing the fold
 To install the modules required for the functioning of the methods proposed in the paper
 go to the folder containitng the files **requirements.txt** and **requirements.yml**
 
-here, depending on the package manager of your choice, type 
+here, depending on the package manager of your choice, type: 
 
 pip install -r requirements.txt
 
