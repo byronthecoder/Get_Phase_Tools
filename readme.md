@@ -50,6 +50,7 @@ and **paper_example_application.ipynb** (Python Jupyter notebook).
 
 ## getPhaseMask
 This function computes the instantaneous phase of an input signal given its sampling frequency.
+
 Its first argument is the input signal and its second argument the sampling frequency. The following optional arguments are:  
 **m** (positive integer; optional, default: 16): number of values considered in the application of Savitzky-Golay differentiator.  
 **n** (positive integer; optional, default: 5): polynomial order of the differentiator.  
@@ -68,6 +69,7 @@ The function's outputs are:
 
 ## mEMDdeNoise
 The function removes high frequency noise from an input signal given its sampling frequency.
+
 Its first argument is the input signal and its second argument the sampling frequency. The other (optional) arguments are:  
 
 **nMasks** (positive integer; optional, default: 22): number of masking signals for masked EMD application.  
