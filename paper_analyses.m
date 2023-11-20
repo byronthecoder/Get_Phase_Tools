@@ -13,7 +13,7 @@
 
 clear all;
 
-exampleN=2; % select one example with an integer from 1 to 6
+exampleN=5; % select one example with an integer from 1 to 6
 
 addpath('./gen_utils');
 addpath(genpath('./get_phase')); 
@@ -131,7 +131,7 @@ switch exampleN
         ax = flipud(findobj(h.NodeChildren, 'Type','Axes'));
         ax(end).XTick=[];
         for h =1:length(artLabels)
-            myXLims=get(ax(h),'xlim')
+            myXLims=get(ax(h),'xlim');
             myLims=get(ax(h),'ylim');
             text(ax(h),myXLims(1)+diff(myXLims)/100,myLims(2)-diff(myLims)/6,artLabels{h},'FontSize',fSize);
         end
@@ -140,7 +140,7 @@ switch exampleN
         h=stackedplot(sigTf(cycle2(1):cycle2(2)),myData(cycle2(1):cycle2(2),:),'DisplayLabels',{'' '' '' } ,'color','k');
         ax = flipud(findobj(h.NodeChildren, 'Type','Axes'));
         for h =1:length(artLabels)
-            myXLims=get(ax(h),'xlim')
+            myXLims=get(ax(h),'xlim');
             myLims=get(ax(h),'ylim');
             text(ax(h),myXLims(1)+diff(myXLims)/100,myLims(2)-diff(myLims)/6,artLabels{h},'FontSize',fSize);
         end

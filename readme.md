@@ -26,8 +26,13 @@ In order to use the proposed methods in you own workflow you need to add the fol
 
 addpath(genpath('./get_phase'))
 
-This is not required when running demo.mlx from the location containing the folders **get_phase** and **data** or when running **paper_analyses.m** from the location containing the folders **get_phase**, **gen_utils** and **data**.
- 
+This is not required when running demo.mlx from the location containing the folders **get_phase** and **data** or when running **paper_analyses.m** 
+from the location containing the folders **get_phase**, **gen_utils** and **data**.  
+Note: the provided programs have been developed with Matlab 2018b endowed with the Statistics and the Signal Processing toolboxes. 
+In order to make the programs work without these tolbxes, the present dirstibution includes several relacement functions 
+(mainly gathered from the freely avialble Fieldtrip toolbox [1], see: https://www.fieldtriptoolbox.org/faq/matlab_replacements/). 
+These functions are stored in the subflders 'get_phase\utils\tbxsSubst\signalProcessing' and 'get_phase\utils\tbxsSubst\statistics'. 
+If however the required toolboxes are avialable, it advised to delete the corresponding subfolders.
 
 ## Python:  
 To install the modules required for the functioning of the methods proposed in the paper
@@ -85,4 +90,8 @@ the function's outputs are:
 
 # Copyright
 
-This code is licensed under the GNU-GPL (see LICENSE file). If you use it, you have to refer to the companion paper avialable here: https://doi.org/10.1101/2023.11.01.564135
+This code is licensed under the GNU-GPL (see LICENSE file). If you use it, you have to refer to the companion paper avialable here: https://doi.org/10.1101/2023.11.01.564135  
+
+# References  
+
+[1] Robert Oostenveld, Pascal Fries, Eric Maris, and Jan-Mathijs Schoffelen. FieldTrip: Open Source Software for Advanced Analysis of MEG, EEG, and Invasive Electrophysiological Data. Computational Intelligence and Neuroscience, 2011; 2011:156869
