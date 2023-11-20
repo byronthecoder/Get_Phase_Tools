@@ -28,6 +28,7 @@ addpath(genpath('./get_phase'))
 
 This is not required when running demo.mlx from the location containing the folders **get_phase** and **data** or when running **paper_analyses.m** 
 from the location containing the folders **get_phase**, **gen_utils** and **data**.  
+
 Note: the provided programs have been developed with Matlab 2018b endowed with the Statistics and the Signal Processing toolboxes. 
 In order to make the programs work without these tolbxes, the present dirstibution includes several relacement functions 
 (mainly gathered from the freely avialble Fieldtrip toolbox [1], see: https://www.fieldtriptoolbox.org/faq/matlab_replacements/). 
