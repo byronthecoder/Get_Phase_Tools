@@ -39,7 +39,7 @@ plot(y+y1,'k');
 set(gca,'xtick',[])
 title('x_{1}+x_{2}','Interpreter','tex')
 aa(2)=subplot(4,2,4);
-plot(wrapTo2Pi(unwrap(angle(hilbert(y+y1)))),'k');
+plot(wrapTo2Pi(unwrap(angle(hilbert(zscore(y+y1))))),'k');
 set(gca,'xtick',[])
 title('\phi(x_{1}+x_{2})','Interpreter','tex')
 
@@ -48,7 +48,7 @@ plot(y+y1+y2,'k');
 set(gca,'xtick',[])
 title('x_{1}+x_{2}+x_{3}','Interpreter','tex')
 aa(4)=subplot(4,2,8);
-plot(wrapTo2Pi(unwrap(angle(hilbert(y+y1+y2)))),'k');
+plot(wrapTo2Pi(unwrap(angle(hilbert(zscore(y+y1+y2))))),'k');
 title('\phi(x_{1}+x_{2}+x_{3})','Interpreter','tex')
 xlabel('Time steps')
 linkaxes(aa,'x');

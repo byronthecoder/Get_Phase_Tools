@@ -15,6 +15,35 @@ from scipy.stats import zscore
 from stochastic.processes.noise import FractionalGaussianNoise
 from hurst import compute_Hc
 
+
+def interp_NAN(X,method='linear'):
+    """
+    interpolate NAN vales according to the method in the second argument
+    this can be either pchip or whatever method accepted by scipy interp1d
+    method can be either 'linear' or 'pchip'
+    """ 
+    newX=copy.copy(X)
+    mynans=np.isnan(newX)
+    if np.sum(mynans)==0:
+        return  newX
+    
+    justnans=np.empty(np.size(X))
+    justnans[:]=np.nan
+    if method =='pchip':
+        if np.argwhere(mynans)[0]==0:
+            newX[0]=newX[np.argwhere(np.isnan(newX)==0)[0]]
+        if np.argwhere(mynans)[-1]==len(X)-1:
+            newX[-1]=newX[np.argwhere(np.isnan(newX)==0)[-1]]
+        mynans=np.isnan(newX)
+        f = interpolate.PchipInterpolator(np.where(mynans==0)[0], newX[mynans==0], extrapolate=False) 
+    else:
+        f = interpolate.interp1d(np.where(mynans==0)[0], newX[mynans==0],method, fill_value="extrapolate");
+    
+    justnans[mynans]=f(np.squeeze(np.where(mynans)))
+    
+    newX[mynans] = justnans[mynans]
+    return newX
+
 def normalize_cycle_amp(sig,symmetric=1,threshNorm=1e-10,maxIterN=5,symN=2):
     """
     demodulate envelope peaks iteratively and using pchip interpolation.
@@ -148,13 +177,15 @@ def do_mask_sift(resid,CF=None,nMasks=4,ampCoeff=None,frqEst='phi',emdObj=None):
         
     return np.sum(IMFs - m,axis=1)/nMasks, CF, m[:, 0]
 
-def quadAngle(IMFin,hilbQuad=0):
+def quadAngle(IMFin, hilbQuad=0, thresh=0):
     """ 
     computes the instantaneous phase of the columns of IMFin via the direct quadrature method
     Input:
         IMFin: array of signals (each column is a different signal)
         hilbQuad: toggle 0/1: if 1, hilbert quadrature (mask = sign(hilbert(data))),
             otherwise direct quadrature (mask= ((np.diff(data)>0) * -2) + 1;mask =np.append(mask,mask[-1]))
+        thresh: if hilbQuad is equal to 0 and thresh>0 elements of the quadrature
+            signal whose absolute values are smaller than thresh are replaced by interpolated values (pchip interpolationis used).
     Output:
         array of phase values
     """
@@ -200,6 +231,10 @@ def quadAngle(IMFin,hilbQuad=0):
         
     #5.multiplying by mask flips data in 3rd & 4th quadrature
         q = y * mask
+        if thresh>0:
+            q[np.abs(q)<thresh]=np.nan;
+            q=interp_NAN(q);
+        
         quadrature[:,i] = data+1j* q
     
     quadAngle=np.angle(quadrature)

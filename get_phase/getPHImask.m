@@ -8,7 +8,7 @@ function [newPHI,IMF1,PHI,centeredSig,mask ]=getPHImask(signal,sr,m,n,nMasks,amp
 % ampCoeff:(positive real; optional, default: 2) coefficient determining the amplitude of the masks as a
 %            proportion of 4*std(signal), which is meant to be a rough estimate of the signal's 
 %           range from the std if the signal's values are normally distributed.
-% quadMethod: (a string or a cell of two strings, default: {'h','h'}). MEthod to be use in the 
+% quadMethod: (a string or a cell of two strings, default: {'h','h'}). Method to be use in the 
 %            computation of the quadrature signal 'h' stands for Hilbert and 'q'. 
 %            If two strings are provided a different method will be adopted in in the first 
 %            or the second part of the algorithm.

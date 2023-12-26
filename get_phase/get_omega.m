@@ -25,7 +25,7 @@ end
 p=1; % index of the relevant S.G. coefficients
 h=1/sr; % sampling period
 
-myKernel=factorial(p)/(-h)^p * g(:,p+1); % cernel of the differentiator
+myKernel=factorial(p)/(-h)^p * g(:,p+1); % kernel of the differentiator
 
 
 PHIu=unwrap(PHIc); % unwrap phase

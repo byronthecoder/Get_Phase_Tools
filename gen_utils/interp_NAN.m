@@ -22,25 +22,25 @@ end
 if firstnonNan>1
     X(1)=X(firstnonNan);
 end
-if strcmp(method,'linear')
-    Xtrim=X;
-    mynans=isnan(Xtrim);
-    newXtrim=Xtrim;
-    justnans=nan(size(Xtrim));
-    justnans(mynans) = interp1(find(~mynans), Xtrim(~mynans), find(mynans), method,'extrap');
-
-    newXtrim(mynans) = justnans(mynans);
-
-    newX=[nan(firstnonNan-1,size(X,2)); newXtrim ; nan(size(X,1)-lastnonNan,size(X,2))];
-    justnans=[nan(firstnonNan-1,size(X,2));justnans ; nan(size(X,1)-lastnonNan,size(X,2))];
-
-else
+% if strcmp(method,'linear')
+%     Xtrim=X;
+%     mynans=isnan(Xtrim);
+% %     newXtrim=Xtrim;
+%     justnans=nan(size(Xtrim));
+%     justnans(mynans) = interp1(find(~mynans), Xtrim(~mynans), find(mynans), method,'extrap');
+% 
+%     newXtrim(mynans) = justnans(mynans);
+% 
+%     newX=[nan(firstnonNan-1,size(X,2)); newXtrim ; nan(size(X,1)-lastnonNan,size(X,2))];
+%     justnans=[nan(firstnonNan-1,size(X,2));justnans ; nan(size(X,1)-lastnonNan,size(X,2))];
+% 
+% else
     newX=X;
 	mynans=isnan(X);
     justnans=nan(length(X),1);
     justnans(mynans) = interp1(find(~mynans), X(~mynans), find(mynans), method,'extrap');
     newX(mynans) = justnans(mynans);
-end
+% end
 
 % if turnit==1
 %    newX=newX';
