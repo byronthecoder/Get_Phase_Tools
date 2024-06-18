@@ -65,7 +65,7 @@ while nPks>0 && nn < maxIMFn && stdRatio>stdRatioThresh
                       % this corresponds to twice the range of the input signal
     end
     
-    myModeN=normalize_cycle_amp(myMode); % apply refined amplitude normalization
+    myModeN=demodulateAmp(myMode); % apply refined amplitude normalization
     
     PHIc=angle(hilbert(myModeN));%hilbert phase (the first estimate is used to infer local frequancy)
 
@@ -73,7 +73,7 @@ while nPks>0 && nn < maxIMFn && stdRatio>stdRatioThresh
     
     [outIMFs(:,nn),~]=mask_sift(resid,sigFreq,[],nMasks,thisCoeff); % do masked sifting
     warning off % remove warnings due to NaN ignored during interpolation 
-    myModeN=normalize_cycle_amp(outIMFs(:,nn),[],[],10); % apply refined amplitude normalization 
+    myModeN=demodulateAmp(outIMFs(:,nn),[],[],10); % apply refined amplitude normalization 
     warning on
     PHINew=angle(hilbert(myModeN));%hilbert phase (better suited than quadr. to infer local frequancy)
   

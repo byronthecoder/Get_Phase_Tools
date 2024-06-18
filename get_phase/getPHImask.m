@@ -1,4 +1,4 @@
-function [newPHI,IMF1,PHI,centeredSig,mask ]=getPHImask(signal,sr,m,n,nMasks,ampCoeff,quadMethod,threshs)
+function [newPHI,IMF1,PHI,centeredSig,mask ]=getPHImask(signal,sr,m,n,nMasks,ampCoeff,quadMethod,threshs,sndCorrSp)
 % input: 
 % signal: input signal
 % sr: (positive integer) sampling rate
@@ -9,13 +9,18 @@ function [newPHI,IMF1,PHI,centeredSig,mask ]=getPHImask(signal,sr,m,n,nMasks,amp
 %            proportion of 4*std(signal), which is meant to be a rough estimate of the signal's 
 %           range from the std if the signal's values are normally distributed.
 % quadMethod: (a string or a cell of two strings, default: {'h','h'}). Method to be use in the 
-%            computation of the quadrature signal 'h' stands for Hilbert and 'q'. 
+%            computation of the quadrature signal and phase 'h' stands for Hilbert, 'q' for direct quadrature, 
+%            'qs' for direct quadrature interpolated around zeroes and 'cl' for curve length. 
 %            If two strings are provided a different method will be adopted in in the first 
-%            or the second part of the algorithm.
+%            or the second part of the algorithm. When 'qs' is used the span of the interpolation 
+%            interval is by default one on each side of the zero crossing,
+%            unless differently defined via the parameter 'sndCorrSp'.
 % threshs:(scalar or vector of two positive real values close to zero, default: [1E-10, 1E-10]) threshold for refined 
 %          amplitude normalization. If to values, different thresholds will be used in the two parts 
 %          of the algorithm.
-
+% sndCorrSp:(positive integer: default1) length of the intervals on each side
+%           of the quadrature values close to zero that are interpolated in the coputation of the quadrature 
+%           signal when using Sandoval and De Leon's (2017) correction.
 % output:
 % newPHI: instantaneous phase
 % IMF1: output of masked sifting
@@ -53,7 +58,9 @@ if nargin<8 || isempty(threshs)
 elseif length(threshs)==1
     threshs=[threshs,threshs];
 end
-
+if nargin <9 || isempty(sndCorrSp)
+    sndCorrSp=0;
+end
 origLen=length(signal); %original length of the signal
 
 M = (m+1)/2;      % output point , M = (m+1)/2; % middle point for odd m
@@ -68,36 +75,51 @@ options.FIX=1;
 [centeredSig,~]=emd(signal,options);
 centeredSig=centeredSig(1,:)';
 
-normSig=normalize_cycle_amp(centeredSig,[],threshs(1),5);%refined amplitude normalization
+normSig=demodulateAmp(centeredSig,[],threshs(1),5);%refined amplitude normalization
 
 if strcmpi(quadMethod{1},'q')
     PHI=quadAngle(normSig,0); % direct quadrature phase estimation 
-elseif strcmpi(quadMethod{1},'hq')
-    PHI=quadAngle(normSig,1); % hilbert quadrature phase estimation 
+elseif strcmpi(quadMethod{1},'qs')
+    PHI=quadAngle(normSig,max(1,sndCorrSp)); % direct quadrature phase estimation with Sandoval and de Leon (2017) correction 
 elseif strcmpi(quadMethod{1},'h')
     PHI=wrapTo2Pi(unwrap(angle(hilbert(normSig)))); % hilbert  estimation 
+elseif strcmpi(quadMethod{2},'cl')
+    [ ~,embedding]=quadAngle(normSig,sndCorrSp);
+    NV=[1,0];
+    shiftAngle=atan2(NV(2),NV(1));%acos(min(1,max(-1, u(:).' * v(:) / norm(u) / norm(v) )));   
+    PHI=co_distproto(embedding', NV');% curve length quadrature phase estimation 
+    PHI =wrapTo2Pi(PHI-shiftAngle);% correct for initial phase shift due to the chosen Ponicaré surface sect. 
 else
-    error('quadMethod can only be ''q'',''h'' or ''hq''')
+    error('quadMethod can only be ''q'', ''h'', ''qs''  or ''cl''')
 end
 
 newPHI=PHI;
 %estimation of local frequancies
+% sigAmp=get_amp(centeredSig);
+% sigFreq1=get_omega(newPHI,sr,m,g,sigAmp./range(sigAmp));
 sigFreq=get_omega(newPHI,sr,m,g);
+
 t=[1:length(newPHI)]./sr; %time stamps of the phase signal
 if ~isempty(ampCoeff)
     ampCoeff=ampCoeff.*4.*std(signal);
 end
 [IMF1,~,mask]=mask_sift(signal,sigFreq,[],nMasks,ampCoeff);%get signal via masked sifting
-IMF=normalize_cycle_amp(IMF1,[],threshs(2),5);%refined amplitude normalizatin algo
+IMF=demodulateAmp(IMF1,[],threshs(2),5);%refined amplitude normalizatin algo
 
 if strcmpi(quadMethod{2},'q')
 	newPHI=quadAngle(IMF,0); % direct quadrature phase estimation 
-elseif strcmpi(quadMethod{2},'hq')
-    newPHI=quadAngle(IMF,1); % hilbert quadrature phase estimation 
 elseif strcmpi(quadMethod{2},'h')
     newPHI=wrapTo2Pi(unwrap(angle(hilbert(IMF)))); % hilbert  estimation 
+elseif strcmpi(quadMethod{2},'qs')
+    newPHI=quadAngle(IMF,max(1,sndCorrSp)); % direct quadrature phase estimation with Sandoval and de Leon (2017) correction 
+elseif strcmpi(quadMethod{2},'cl')
+    [~,embedding]=quadAngle(IMF,sndCorrSp);
+    NV=[1,0];% normal to the Poincare section
+    shiftAngle=atan2(NV(1),NV(2));%(argument are inverted to get the direction of the Poincaré section)%acos(min(1,max(-1, u(:).' * v(:) / norm(u) / norm(v) )));   
+    newPHI=co_distproto(embedding', NV');% curve length quadrature phase estimation 
+    newPHI =wrapTo2Pi(newPHI-shiftAngle);% correct for initial phase shift due to the chosen Ponicaré surface sect. 
 else
-    error('quadMethod can only be ''q'',''h'' or ''hq''')
+    error('quadMethod can only be ''q'', ''h'', ''qs'' or ''cl''')
 end
 
 

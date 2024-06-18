@@ -15,14 +15,16 @@ clear all;
 
 exampleN=5; % select one example with an integer from 1 to 6
 
-addpath('./gen_utils');
+addpath(genpath('./gen_utils'));
 addpath(genpath('./get_phase')); 
-
+if exist('./figures','dir')<1
+    mkdir('./figures')
+end
 %Savitzky-Golay differentiator parameters:
 m = 16;      % number of filtered points (FIR order)
 n = 5;      % approximation polynomial order
 
-phaseMethod='h'; % set method to extract quadrature signal. Possible methods: 'h','q','hq' (the last one is expereimental, do not use)
+phaseMethod={'h','h'}; % set method to extract quadrature signal. Possible methods: 'h','q','lc', 'hq' (the last one is expereimental, do not use)
 threshs=1e-10; %threshold for the (refined) amplitude normalization operation 
 ampCoeff=2; %coefficient modulating the amplitude of the masking signal
 nMasks=22; % number of masking signals for masked sifting 
@@ -44,47 +46,69 @@ switch exampleN
         options.MAXITERATIONS=10; % set maximum sifting iteration to 10
         Decomp=emd(sig,options)'; % get classic decomposition
 
+        options.MAXITERATIONS=1; % set maximum sifting iteration to 1
+        firstMode=emd(sig,options)'; % get classic decomposition
+        firstMode=firstMode(:,1);% get firstMode
+        
         [PHI,newIMF,PHI0,centSig,mask]=getPHImask(sig,sr,m,n,nMasks,ampCoeff,phaseMethod,threshs);
-        figure
+ 
         axx=tight_subplot(4,2,0.04,0.08); %initialize subplots
         
         axes(axx(1));
         plot(sigT,sig,'k'); % plot signal
         xticks([])
-        title('\textbf{Heel height}','interpreter','latex')
+        title('\textbf{Heel height} (m)','interpreter','latex')
         axes(axx(3));
         plot(sigT,wrapTo2Pi(unwrap(angle(hilbert(zscore(sig))))),'k'); % plot hilbert phase of z-scored signal
         setPhaseAx(gca) % set y ticks
         xticks([])
-        title('\textbf{Hilbert phase of Heel height}','interpreter','latex')
+        title('\textbf{Hilbert phase of Heel height} (rad)','interpreter','latex')
         axes(axx(5));
-        plot(sigT,wrapTo2Pi(unwrap(angle(hilbert(normalize_cycle_amp(Decomp(:,1)))))),'k');% plot hilber phase of amplitude normalized first IMF from EMD
+        plot(sigT,wrapTo2Pi(unwrap(angle(hilbert(demodulateAmp(Decomp(:,1)))))),'k');% plot hilber phase of amplitude normalized first IMF from EMD
+%         hold on;
+%         plot(sigT,zscore(Decomp(:,1))+pi,'k:','linewidth',1);% plot hilber phase of amplitude normalized first IMF from EMD
+
         setPhaseAx(gca)
         xticks([])
-        title('\textbf{Hilbert phase of $$IMF_{1}$$}','interpreter','latex')
+        title('\textbf{Hilbert phase of $$IMF_{1}$$} (rad)','interpreter','latex')
         axes(axx(7));
-        plot(sigT,wrapTo2Pi(unwrap(angle(hilbert(normalize_cycle_amp(Decomp(:,2)))))),'k');% plot hilber phase of amplitude normalized second IMF from EMD
+        plot(sigT,wrapTo2Pi(unwrap(angle(hilbert(demodulateAmp(Decomp(:,2)))))),'k');% plot hilber phase of amplitude demodulated second IMF from EMD
+%            hold on;
+%         plot(sigT,zscore(Decomp(:,2))+pi,'k:','linewidth',1);% plot hilber phase of amplitude demodulated first IMF from EMD
+
         setPhaseAx(gca)
-        title('\textbf{Hilbert phase of $$IMF_{2}$$}','interpreter','latex')
+        title('\textbf{Hilbert phase of $$IMF_{2}$$ } (rad)','interpreter','latex')
         xlabel('Time (sec)')
 
         axes(axx(2));
-        plot(sigT,newIMF,'k');% plot signal after masked sifting
+        plot(sigT,firstMode,'k');% plot signal after one sifting iteration
+        hold on;
+        plot(sigT,Decomp(:,1),'k:','linewidth',.8);
         xticks([])
-        title('\textbf{Output of Masked Sifting ($$\hat{x}$$)}','interpreter','latex')
+        title('\textbf{Output of one and 10 Sifting iterations}','interpreter','latex')
 
         axes(axx(4));
-        IMFF=normalize_cycle_amp(newIMF,[],[],5);%refined amplitude normalizatin algo 
+        plot(sigT,newIMF,'k');% plot signal after masked sifting
+        xticks([])
+        title('\textbf{Output of Masked Sifting ($$\breve{x}$$)}','interpreter','latex')
 
+        axes(axx(6));
+        IMFF=demodulateAmp(newIMF,[],[],5);%refined amplitude demodulation algo 
+        plot(sigT,IMFF,'k') %plot demodulated IMF
+        xticks([])
+        title('\textbf{Demodulated output of Masked Sifting ($$\hat{x}$$)}','interpreter','latex')
+
+        axes(axx(8));
         plot(sigT,wrapTo2Pi(unwrap(angle(hilbert(IMFF)))),'k');% plot phase of the obtained signal
         setPhaseAx(gca)
         xlabel('Time (sec)')
-        title('\textbf{Hilbert phase of $$\hat{x}$$}','interpreter','latex')
+        title('\textbf{Hilbert phase of $$\hat{x}$$} (rad)','interpreter','latex')
 
         linkaxes(axx,'x')
-         xlim([2500/sr,5500/sr])
-        delete([axx(6),axx(8)])
-    
+        xlim([2500/sr,5500/sr])
+%         delete([axx(8)])%axx(6),
+        print('./figures/fig_10','-dtiff', '-r600')
+
     case 2
         
         artDimN=[16,18,20];%select relevant channels: ttip 16, llip 18, jawY 20 
@@ -116,9 +140,12 @@ switch exampleN
         fSize=8;
         
         figure;
-        
+        set(gcf, 'position',[360 132 815 485])
         subplot(4,4,[1 2 3 5 6 7 9 10 11 13 14 15]);%initialize subplots
-        haa=stackedplot(sigTf,myData(:,:),'DisplayLabels',{'' '' '' } ,'color','k');% plot all sequence
+        haa=stackedplot(sigTf,myData(:,:),'DisplayLabels',{'(cm)' '(cm)' '(cm)' } ,'color','k');% plot all sequence
+        ax = findobj(haa.NodeChildren, 'Type','Axes');
+        set([ax.YLabel],'Rotation',90,'HorizontalAlignment', 'Center', 'VerticalAlignment', 'Bottom')
+        
         ax = flipud(findobj(haa.NodeChildren, 'Type','Axes'));
         for h =1:length(artLabels)
             myLims=get(ax(h),'ylim');
@@ -131,31 +158,36 @@ switch exampleN
         ax = flipud(findobj(h.NodeChildren, 'Type','Axes'));
         ax(end).XTick=[];
         for h =1:length(artLabels)
-            myXLims=get(ax(h),'xlim');
+            myXLims=get(ax(h),'xlim')
             myLims=get(ax(h),'ylim');
             text(ax(h),myXLims(1)+diff(myXLims)/100,myLims(2)-diff(myLims)/6,artLabels{h},'FontSize',fSize);
         end
         
         subplot(4,4,[12 16]);% plot fast cycle
-        h=stackedplot(sigTf(cycle2(1):cycle2(2)),myData(cycle2(1):cycle2(2),:),'DisplayLabels',{'' '' '' } ,'color','k');
-        ax = flipud(findobj(h.NodeChildren, 'Type','Axes'));
+        hh=stackedplot(sigTf(cycle2(1):cycle2(2)),myData(cycle2(1):cycle2(2),:),'DisplayLabels',{'' '' '' } ,'color','k');
+        
+        xlabel('Time (sec)');
+        ax = flipud(findobj(hh.NodeChildren, 'Type','Axes'));
         for h =1:length(artLabels)
-            myXLims=get(ax(h),'xlim');
+            myXLims=get(ax(h),'xlim')
             myLims=get(ax(h),'ylim');
             text(ax(h),myXLims(1)+diff(myXLims)/100,myLims(2)-diff(myLims)/6,artLabels{h},'FontSize',fSize);
         end
-        xlabel('Time (sec)');
         
         myPhases=zeros(size(myData)); %initialize matrix containing phase values
         for dataN=1:size(myData,2)
             [PHI,newIMF,PHI0,centeredSig,mask]=getPHImask(myData(:,dataN),sr,m,n,nMasks,ampCoeff,phaseMethod,threshs);
             myPhases(:,dataN)=PHI;
         end
-        
+        print('./figures/fig_11','-dtiff', '-r600')
+
         figure;
-        stackedplot(sigTf,[myData(:,3),myPhases(:,:)],'DisplayLabels',{'' '' '' '' } ,'color','k');
+        set(gcf, 'position',[83 198 860 294])
+        h=stackedplot(sigTf,[myData(:,3),myPhases(:,:)],'DisplayLabels',{'cm' 'rad' 'rad' 'rad' } ,'color','k');
+        ax = findobj(h.NodeChildren, 'Type','Axes');
+        set([ax.YLabel],'Rotation',90,'HorizontalAlignment', 'Center', 'VerticalAlignment', 'Bottom')
         xlabel('Time (sec)');
-        
+        print('./figures/fig_12','-dtiff', '-r600')
     case 3
         
         pathIn='./data./cl_pata_2.mat';
@@ -166,6 +198,9 @@ switch exampleN
         filtereds=nan(size(dataIn.data,1),length(artDimN));% build matrix to store denoised signals
         filteredidx={};% initialize vector with the indexes of the deterministic components as empty
         figure
+        set(gcf, 'position',[360 208 790 410])
+        [a,bbpos]=tight_subplot(6,1,0.03,0.08); %initialize subplots
+
         for nDim=1:length(artDimN)
             sigsIn(:,nDim)=dataIn.data(:,artDimN(nDim));% get sensor data
             sr=dataIn.samplerate;% sampling rate
@@ -174,17 +209,24 @@ switch exampleN
 
             [PHI,~,~,~,~]=getPHImask(filtereds(:,nDim),sr,m,n,nMasks,ampCoeff,phaseMethod,threshs);
             newPHIs(:,nDim)=PHI;
-            
-            a(2*(nDim-1)+1)=subplot(6,1,2*(nDim-1)+1);
+            axes(a(2*(nDim-1)+1))
+%             a(2*(nDim-1)+1)=subplot(6,1,2*(nDim-1)+1);
             plot(sigInT,sigsIn(:,nDim),'k');
-            a(2*(nDim-1)+2)=subplot(6,1,2*(nDim-1)+2);
+            set(gca,'xtick',[],'xticklabels',[]) 
+            ylabel('(cm)')
+            axes(a(2*(nDim-1)+2))
+%             a(2*(nDim-1)+2)=subplot(6,1,2*(nDim-1)+2);
             plot(sigInT,newPHIs(:,nDim),'k');
-
+            ylabel('(rad)')
+            if nDim<length(artDimN)
+               set(gca,'xtick',[],'xticklabels',[]) 
+            end
         end
         xlabel('Time (sec)');
 
         linkaxes(a,'x')
-    
+        print('./figures/fig_13','-dtiff', '-r600')
+
     case 4 % Knee flexion data
         
         dataIn=load('./data./kneemovs.mat');%load data
@@ -202,26 +244,38 @@ switch exampleN
 
         options.MAXITERATIONS=10; % set maximum sifting iteration to 10
         Decomp=emd(sigInf,options)';% apply EMD
-        normSig=normalize_cycle_amp(Decomp(:,1));% %refined amplitude normalizatin algo 
-
-        figure
-        c(1)=subplot(411);
-        plot(sigInTf,sigInf,'k')% plot filtered signal
+        normSig=demodulateAmp(Decomp(:,1));% %refined amplitude normalizatin algo 
         
+        figure
+        set(gcf,'position',[360 200 740 420])
+        [c,bbpos]=tight_subplot(4,1,0.03,0.08); %initialize subplots
+        axes(c(1));
+%         c(1)=subplot(411);
+        plot(sigInTf,sigInf,'k')% plot filtered signal
+        set(gca,'xtick',[])
+        ylabel('deg')
         ylim([min(-findpeaks(-sigIn))-1,max(findpeaks(sigIn))+1])% adjust axis y limits
-        c(2)=subplot(412);
+        axes(c(2));%c(2)=subplot(412);
         plot(sigInTf,wrapTo2Pi(unwrap(angle(hilbert(zscore(sigIn))))),'k')%plot hilbert phase of input signal
         setPhaseAx(gca)
-        c(3)=subplot(413);
+        set(gca,'xtick',[])
+        ylabel('rad')
+        axes(c(3));
+        %c(3)=subplot(413);
         plot(sigInTf,wrapTo2Pi(unwrap(angle(hilbert(normSig)))),'k')%plot hilbert phase of first IMF after amplitude normalization
         setPhaseAx(gca)
-        c(4)=subplot(414);
+        set(gca,'xtick',[])
+        ylabel('rad')
+%         c(4)=subplot(414);
+        axes(c(4));
         plot(sigInTf,wrapTo2Pi(unwrap(PHI)),'k')%plot hilbert phase from our approach
         setPhaseAx(gca)
-
+        set(gca,'xtick',[])
+        ylabel('rad')
         linkaxes(c,'x')
         xlim([0,7000./sr])% set x axis limits
         xlabel('Time (sec)')
+        print('./figures/fig_8','-dtiff', '-r600')
 
         % test the effect of the low pass filter frequency on the number of
         % cycles observed via EMD and via our approach
@@ -236,11 +290,11 @@ switch exampleN
             lpfilt =fir1(filtLen, cutoff/(sr/2)); % get filter coefficients
             sigInf=filter(lpfilt,1,sigIn);    % filter input signal
             shift=floor(filtLen/2);
-             sigInf=[sigInf(shift+1:end);ones(shift,1).*1e-7];
+            sigInf=[sigInf(shift+1:end);ones(shift,1).*1e-7];
             [PHI,~,~,~,~]=getPHImask(sigInf,sr/2,m,n,nMasks,ampCoeff,phaseMethod,threshs);
             
             Decomp=emd(sigInf)'; % apply EMD
-            normSig=normalize_cycle_amp(Decomp(:,1));% apply refined amplitude normalization
+            normSig=demodulateAmp(Decomp(:,1));% apply refined amplitude normalization
             emdPhase=angle(hilbert(normSig)); % get Hilbert phase
             nCyclesEMD(niter)=sum(diff(unwrap(emdPhase))./(2*pi)); % count number of observed cycles via EMD
             nCycles(niter)=sum(diff(unwrap(PHI))./(2*pi)); % count number of observed cycles with inclusive behaviour
@@ -255,7 +309,8 @@ switch exampleN
         xticks(round(filtFreqs));%set x axis ticks
         ylabel('Number of cycles')
         xlabel('Low pass filter cut-off frequency (Hz.)')
-        
+        print('./figures/fig_9','-dtiff', '-r600')
+
 	case 5 %EGG data
         
         sr=5000;% set new signal sr 
@@ -280,25 +335,24 @@ switch exampleN
         %sifting iteration); mask, input signal plus mask; partial IMF
         %obtained via masked sifting; final IMF obtained averaging
         %partial IMFs
-        [bb,bbpos]=tight_subplot(6,1,0.03,0.08); %initialize subplots
-
+        [bb,bbpos]=tight_subplot(6,1,0.06,0.08); %initialize subplots
         axes(bb(1))
-        plot(mySig,'k');
-        title('\textbf{Electroglottographic signal}','interpreter','latex')
+        plot(mySigT,zscore(mySig),'k');
+        title('\textbf{Electroglottographic signal} (ZSU)','interpreter','latex')
         axes(bb(2))
-        plot(imf1(1,:),'k');
+        plot(mySigT,imf1(1,:),'k');
         title('\textbf{Centred signal}','interpreter','latex')
         axes(bb(3))
-        plot(mask,'k');
+        plot(mySigT,mask,'k');
         title('\textbf{Mask signal}','interpreter','latex')
         axes(bb(4))
-        plot(mySig+mask,'k');
+        plot(mySigT,mySig+mask,'k');
         title('\textbf{Mask signal plus Electroglottographic signal}','interpreter','latex')
         axes(bb(5))
-        plot(partialSift,'k');
+        plot(mySigT,partialSift,'k');
         title('\textbf{Partial Sifting output}','interpreter','latex')
         axes(bb(6))
-        plot(newIMF,'k');
+        plot(mySigT,newIMF,'k');
         title('\textbf{Sifting output}','interpreter','latex')
         for nn=1:length(bb)
            if nn<length(bb)
@@ -307,24 +361,34 @@ switch exampleN
            set(bb(nn),'box','off')
         end
         linkaxes(bb,'x')
+        xlim([0.168, 0.22])
         xlabel('Time (sec)')
-        normSig=normalize_cycle_amp(imf(2,:)',[],[],5);%Refined normalization applied to second IMF from EMD
-        PHI1=angle(hilbert(normSig)); % hilbert phase estimation 
+        print('./figures/fig_15','-dtiff', '-r600')
 
+        
+        normSig=demodulateAmp(imf(2,:)',[],[],5);%Refined normalization applied to second IMF from EMD
+        PHI1=angle(hilbert(normSig)); % hilbert phase estimation 
+       
         figure;
-        [aa,aapos]=tight_subplot(3,1,0.05,0.08); %initialize subplots
+        set(gcf, 'position', [100 255 1000 362])
+
+        [aa,aapos]=tight_subplot(3,1,0.08,0.08); %initialize subplots
         axes(aa(1));
-        plot(mySigT,mySig,'k'); %plot input signal
+        plot(mySigT,zscore(mySig),'k'); %plot input signal
         set(gca,'xtick',[])
-        title('\textbf{Electroglottographic signal}','interpreter','latex','fontsize',14)
+        title('\textbf{Electroglottographic signal} (ZSU)','interpreter','latex','fontsize',12)
         axes(aa(2))
         plot(mySigT,PHI,'k');% plot phase from our approach
+        ylabel('')
         set(gca,'xtick',[])        
-        title('\textbf{Hilbert phase via the proposed method}','interpreter','latex','fontsize',14)
+        title('\textbf{Hilbert phase via the proposed method} (rad)','interpreter','latex','fontsize',12)
         axes(aa(3))
         plotMe=wrapTo2Pi(unwrap(PHI1));
         plot(mySigT,plotMe,'k');% plot phase from the approach in Huang et al. (2009)
-        title('\textbf{Hilbert phase via the method in [5]}','interpreter','latex','fontsize',14)
+        ylabel('')
+        title('\textbf{Hilbert phase via EHHT} (rad)','interpreter','latex','fontsize',12)
         linkaxes(aa,'x')
         xlabel('Time (sec)')
+        print('./figures/fig_14','-dtiff', '-r600')
+
 end

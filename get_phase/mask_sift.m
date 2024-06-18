@@ -49,7 +49,7 @@ if nargin<2 || isempty(maskOmega) || (length(maskOmega)==1 && maskOmega==0)
     [IMF0,~]=emd(x,options);
     IMF0=IMF0(1,:)';
  
-    IMF0= normalize_cycle_amp(IMF0);     % refined amplitude normalization
+    IMF0= demodulateAmp(IMF0);     % refined amplitude normalization
     if strcmp(frqEst,'phi')              % if frequency is to be estimated via phase derivative
         IPH=angle(hilbert(IMF0));        % phase
         Ifreq=diff(unwrap(IPH));         

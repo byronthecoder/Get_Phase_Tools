@@ -1,5 +1,5 @@
-function normSig=normalize_env_peaks(sig,threshNorm,maxIterN, symN)
-%    normalize envelope peaks iteratively following Huang et al. (2009) and using pchip
+function normSig=demodulateAmp0(sig,threshNorm,maxIterN, symN)
+%    demodulate envelope peaks iteratively following Huang et al. (2009) and using pchip
 %    interpolation to obtain the envelope connecting the abs. values of local extrema.
 %    Boundary conditions of the local maxima sequence are computed following 
 %    Rilling 2007 (see function in '.\utils\boundary_conditions.m').
@@ -10,7 +10,7 @@ function normSig=normalize_env_peaks(sig,threshNorm,maxIterN, symN)
 %         symN: number of values to be added at the beginning and at the
 %               end before interpolating.
 %     output:
-%         normalized envelope
+%         demodulated envelope
 % 
 
 if nargin <2 || isempty(threshNorm) || isnan(threshNorm)

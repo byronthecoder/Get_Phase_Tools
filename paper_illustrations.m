@@ -11,6 +11,9 @@ warning 'off'
 
 addpath('./gen_utils');
 addpath(genpath('./get_phase')); 
+if exist('./figures','dir')<1
+    mkdir('./figures')
+end
 %% problems solvable with Huang's approach.
 
 
@@ -28,30 +31,37 @@ y2=2.*sin(phaseY2);
 
 figure;
 subplot(4,2,[1,3,5,7])
-ss=stackedplot([y;y1;y2]','DisplayLabels',{'x_{1}','x_{2}','x_{3}'},'color','k');
+ss=stackedplot([y;y1;y2]','DisplayLabels',{'x_{1} (AU)','x_{2} (AU)','x_{3} (AU)'},'color','k');
 for i=1:length(ss.DisplayLabels)
     axesProps = struct(ss.AxesProperties(i));
     axesProps.Axes.YLabel.Interpreter = 'tex';
 end
+ax = findobj(ss.NodeChildren, 'Type','Axes');
+set([ax.YLabel],'Rotation',90,'HorizontalAlignment', 'Center', 'VerticalAlignment', 'Bottom')
+
 xlabel('Time steps')
 aa(1)=subplot(4,2,2);
 plot(y+y1,'k');
 set(gca,'xtick',[])
-title('x_{1}+x_{2}','Interpreter','tex')
+title('\textbf{$$x_{1}+x_{2}$$}','Interpreter','latex')
+ylabel(gca,'')
 aa(2)=subplot(4,2,4);
 plot(wrapTo2Pi(unwrap(angle(hilbert(zscore(y+y1))))),'k');
 set(gca,'xtick',[])
-title('\phi(x_{1}+x_{2})','Interpreter','tex')
-
+setPhaseAx(gca)
+title('\textbf{$$\phi(x_{1}+x_{2})$$} (rad)','Interpreter','latex')
 aa(3)=subplot(4,2,6);
 plot(y+y1+y2,'k');
 set(gca,'xtick',[])
-title('x_{1}+x_{2}+x_{3}','Interpreter','tex')
+title('\textbf{$$x_{1}+x_{2}+x_{3}$$}','Interpreter','latex')
 aa(4)=subplot(4,2,8);
 plot(wrapTo2Pi(unwrap(angle(hilbert(zscore(y+y1+y2))))),'k');
-title('\phi(x_{1}+x_{2}+x_{3})','Interpreter','tex')
+title('\textbf{$$\phi(x_{1}+x_{2}+x_{3})$$} (rad)','Interpreter','latex')
+setPhaseAx(gca)
 xlabel('Time steps')
 linkaxes(aa,'x');
+print('./figures/fig_1','-dtiff', '-r600')
+
 
 [maxEnv,minEnv,meanEnv]=get_envelopes([y+y1+y2]');
 myIMF=(y+y1+y2)-meanEnv;
@@ -73,6 +83,7 @@ plot(meanEnv,'k','linestyle','-.','linewidth',1)
 line(get(gca,'xlim'),[0,0],'color','k')
 set(gca,'xtick',[])
 text(txtX,txtY,'(a)','FontSize',fSize);
+ylabel('\textbf{Input signal} (AU)','interpreter','latex')
 axes(ha(3));
 plot(myIMF,'k')
 xlabel('Time steps')
@@ -95,41 +106,47 @@ txtY=1.8;
 text(txtX,txtY,'(c)','FontSize',fSize);
 
 axes(ha(6));
-plot(normalize_cycle_amp([(y+y1+y2)-meanEnv]'),'k')
+plot(demodulateAmp([(y+y1+y2)-meanEnv]'),'k')
 ylim([-1.8,1.8])
 txtY=1.5;
 text(txtX,txtY,'(d)','FontSize',fSize);
-
 xlabel('Time steps')
+
 delete(ha([2,5]))
+print('./figures/fig_2','-dtiff', '-r600')
+
 
 Decomp=emd([y+y1+y2]');
-normSig=normalize_cycle_amp(Decomp(1,:)');%Huang normalizatin algo
+normSig=demodulateAmp(Decomp(1,:)');%Huang normalizatin algo
 
 figure;
+% tight_subplot(6,3,[0.04,0.05],0.08)
 subplot_tight(4, 2, 1, [0.07, 0.08]);
 plot(y+y1+y2,'k')
 set(gca,'xtick',[])
-title('\textbf{Input signal}','Interpreter','latex')
+title('\textbf{Input signal} (AU)','Interpreter','latex')
 subplot_tight(4, 2, [3,5,7], [0.07, 0.08]);
-ss=stackedplot([Decomp]','DisplayLabels',{'x_{1}','x_{2}','x_{3}'},'Color','k');
+ss=stackedplot([Decomp]','DisplayLabels',{'x_{1} (AU)','x_{2} (AU)','x_{3} (AU)'},'Color','k');
+ax = findobj(ss.NodeChildren, 'Type','Axes');
+set([ax.YLabel],'Rotation',90,'HorizontalAlignment', 'Center', 'VerticalAlignment', 'Bottom')
+xlabel('Time (sec)');
 for i=1:length(ss.DisplayLabels)
     axesProps = struct(ss.AxesProperties(i));
     axesProps.Axes.YLabel.Interpreter = 'tex';
 end
 
 xlabel('Time steps')
-
 subplot_tight(4, 2, 4, [0.07, 0.05]);
 
 plot(normSig,'k');
 set(gca,'xtick',[])
-title('\textbf{N($$IMF_{1}$$)}','Interpreter','latex')
+title('\textbf{$$IMF_{1}$$}','Interpreter','latex')
 subplot_tight(4,2,6, [0.07, 0.05]);
 plot(wrapTo2Pi(unwrap(angle(hilbert(normSig)))),'k')
 xlabel('Time steps')
 setPhaseAx(gca)
-title('\textbf{ $$\phi(x_{1}+x_{2}+x_{3})$$ }','Interpreter','latex')
+title('\textbf{ $$\phi(IMF_{1})$$} (rad)','Interpreter','latex')
+print('./figures/fig_3','-dtiff', '-r600')
 
 %% problems we can solve
 addpath(genpath(['.\utils'])); 
@@ -148,7 +165,7 @@ phaseYOO=t.*3*omg.*2*pi.*(square(t*(omg/6)*2*pi)>0);
 yOnOff=sin(t.*3*omg.*2*pi).*(square(t*(omg/6)*2*pi)>0);
 
 threshs1=[NaN,NaN];threshs2=[NaN,NaN];
-m = 16;      % number of filtered points (FIR order)
+m = 22;      % number of filtered points (FIR order)
 M = (m+1)/2;      % output point , M = (m+1)/2; % middle point for odd m
 n = 5;      % approximation polynomial order
 handleNegPHI='interp'; % set strategy to adopt in intervals with negative frequency
@@ -161,18 +178,18 @@ nMasks=16;
 YY=y+y1+y2+0.2*yOnOff;
 
 Decomp=emd(YY)';
-normSig=normalize_cycle_amp(Decomp(:,1));%Huang normalizatin algo
-normSig1=normalize_cycle_amp(Decomp(:,2));%Huang normalizatin algo
+normSig=demodulateAmp(Decomp(:,1));%Huang normalizatin algo
+normSig1=demodulateAmp(Decomp(:,2));%Huang normalizatin algo
 figure;
 [ha, pos] = tight_subplot(6,3,[0.04,0.05],0.08);
 plotNums=[1,4,7,10,13];
 
 plotData=[YY;yOnOff;y;y1;y2]';
-titles={'\textbf{Input signal}',...
-    '\textbf{Intermittent component}',...
-    '\textbf{$$x_{1}$$}',...
-    '\textbf{$$x_{2}$$}',...
-    '\textbf{$$x_{3}$$}'};
+titles={'\textbf{Input signal (AU)}',...
+    '\textbf{Intermittent component} (AU)',...
+    '\textbf{$$x_{1}$$} (AU)',...
+    '\textbf{$$x_{2}$$} (AU)',...
+    '\textbf{$$x_{3}$$} (AU)'};
 for i = 1:length(plotNums)
     axes(ha(plotNums(i)));
     plot(plotData(:,i),'k');
@@ -183,7 +200,7 @@ for i = 1:length(plotNums)
     end
     title(titles{i},'Interpreter','latex')
 end
-titles={'\textbf{Input signal}',...
+titles={'\textbf{Input signal} (AU)',...
     '\textbf{$$IMF_{1}$$}',...
     '\textbf{$$IMF_{2}$$}',...
     '\textbf{$$IMF_{3}$$}',...
@@ -205,18 +222,18 @@ end
 i0=i+i0;
 plotNums=[3,6,9,12,15,18];
 plotData=[wrapTo2Pi(phaseY)',Decomp];
-titles={'\textbf{$$\phi(x_{1})$$}',...
-    '\textbf{$$\phi(IMF_{1})$$}',...
-    '\textbf{$$\phi(IMF_{2})$$}',...
-    '\textbf{$$\phi(IMF_{3})$$}',...
-    '\textbf{$$\phi(IMF_{4})$$}',...
-    '\textbf{$$\phi(IMF_{5})$$}'};
+titles={'\textbf{$$\phi(x_{1})$$} (rad)',...
+    '\textbf{$$\phi(IMF_{1})$$} (rad)',...
+    '\textbf{$$\phi(IMF_{2})$$} (rad)',...
+    '\textbf{$$\phi(IMF_{3})$$} (rad)',...
+    '\textbf{$$\phi(IMF_{4})$$} (rad)',...
+    '\textbf{$$\phi(IMF_{5})$$} (rad)'};
 for i = 1:min(size(plotData,2),length(plotNums))
     axes(ha(plotNums(i)));
     if i==1
         plot(plotData(:,i),'k');
     else
-        plot(wrapTo2Pi(unwrap(angle(hilbert(normalize_cycle_amp(plotData(:,i)))))),'k');
+        plot(wrapTo2Pi(unwrap(angle(hilbert(demodulateAmp(plotData(:,i)))))),'k');
     end
     if i< length(plotNums)
         set(gca,'xtick',[])
@@ -227,7 +244,9 @@ for i = 1:min(size(plotData,2),length(plotNums))
     setPhaseAx(gca);
 end
 delete(ha(16))
-% 
+print('./figures/fig_4','-dtiff', '-r600')
+
+
 [PHI,siftedSig,PHI0,ceteredSig,mask]=getPHImask(YY,sr,m,n,nMasks,[],phaseMethod,threshs1);
 
 figure;
@@ -235,27 +254,28 @@ figure;
 axes(hb(1));
 plot(YY,'k')
 set(gca,'xtick',[])
-title('\textbf{Input signal}','Interpreter','latex')
-normSig=normalize_env_peaks(Decomp(:,1));%Huang normalizatin algo
+title('\textbf{Input signal} (AU)','Interpreter','latex')
+normSig=demodulateAmp0(Decomp(:,1));%Huang normalizatin algo
 axes(hb(2));
 
 plot(PHI0,'k');
 set(gca,'xtick',[])
 setPhaseAx(hb(2))
-title('\textbf{Initial phase estimate}','Interpreter', 'latex')
+title('\textbf{Initial phase estimate} (rad)','Interpreter', 'latex')
 
 axes(hb(3));
 plot(PHI,'k')
 setPhaseAx(hb(3))
-title('\textbf{Final phase estimate}','Interpreter', 'latex')
+title('\textbf{Final phase estimate} (rad)','Interpreter', 'latex')
 
 set(gca,'xtick',[])
 axes(hb(4))
 plot((wrapTo2Pi(angle(hilbert(normSig)))'),'k');
 setPhaseAx(hb(4))
-title('\textbf{Phase estimate through EHHT}','Interpreter', 'latex')
+title('\textbf{Phase estimate through EHHT} (rad)','Interpreter', 'latex')
 
 xlabel('Time steps')
+print('./figures/fig_7','-dtiff', '-r600')
 
 
 %% problems we can solve 2
@@ -281,7 +301,7 @@ YY=y+y1+y2+0.2*yOnOff;
 options.MAXITERATIONS=10;
 Decomp=emd(YY,options)';
 
-normSig=normalize_env_peaks(Decomp(:,1));
+normSig=demodulateAmp0(Decomp(:,1));
 
 [pksVals, pksLocs]=findpeaks(normSig(:,1));
 [valVals, valsLocs]=findpeaks(-normSig(:,1));
@@ -296,13 +316,16 @@ t = linspace(0, 2*pi, 100);
 t(end+1) = NaN;
 
 figure;
-[ha, pos] = tight_subplot(2,1,[0.02,0.05],0.12);
+[ha, pos] = tight_subplot(2,1,[0.05,0.05],0.1);
 
 axes(ha(1));
 plot(Decomp(:,1),'k')
 set(gca,'xtick',[])
+title('Input signal (AU)')
 axes(ha(2));
 plot(normSig,'k');
+ylim([-1.1,1.1])
+title('Demodulated signal')
 aspectRatio=daspect;
 xradius = 0.1*radius * aspectRatio(1)/aspectRatio(2);
 circle = [xradius*cos(t(:)), yradius*sin(t(:))];
@@ -320,6 +343,7 @@ linkaxes(ha,'x')
 xlabel('time steps')
 xlim([700,1250]);
 
+print('./figures/fig_5','-dtiff', '-r600')
 
 resid1=Decomp(:,1);
 resid2=Decomp(:,1);
@@ -361,7 +385,7 @@ for nIter=1:totNiters
         ylim([-1.2,1.2])
     end
     if nIter==1
-        title('\textbf{Amplitude Normalization Iterations}','interpreter','latex')
+        title('\textbf{Amplitude demodulation iterations}','interpreter','latex')
     end
     nSubIter=nSubIter+1;
     axes(ha(nSubIter));
@@ -379,7 +403,7 @@ for nIter=1:totNiters
         ylim([-1.2,1.2])
     end
     if nIter==1
-        title('\textbf{Refined Amplitude Normalization Iterations}','interpreter','latex')
+        title('\textbf{Refined amplitude demodulation iterations}','interpreter','latex')
     end
     resid1=resid1./env1';
     resid2=resid2./env2';
@@ -388,3 +412,4 @@ end
 linkaxes(ha,'x')
 xlim([1025,1215])
 
+print('./figures/fig_6','-dtiff', '-r600')

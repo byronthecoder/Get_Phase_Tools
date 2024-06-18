@@ -1,4 +1,4 @@
-function sigIn=normalize_cycle_amp(sigIn,symmetric,threshNorm,maxIterN, symN)
+function sigIn=demodulateAmp(sigIn,symmetric,threshNorm,maxIterN, symN)
 %    demodulate envelope peaks iteratively and using pchip interpolation.
 %    At each iteration, max and min are individuated, their absolute values are 
 %    interpolated to obtain an envelope. The signal is then divided by the envelope.
@@ -40,7 +40,7 @@ end
 if nargin<5 || isempty(symN)
     symN=2;
 end
-if symmetric==0 %if the signal is not centred on 0apply centring (one sifting iteration)
+if symmetric==0 %if the signal is not centred on 0, apply centring (one sifting iteration)
     options.MAXITERATIONS=1;
     options.MAXMODES=1;
     [sigIn,~]=emd(sigIn,options);
@@ -67,8 +67,24 @@ while niter<maxIterN && iter_val>threshNorm
     [tExtr,extrOrd]=sort([tMin,tMax]);
     allExtr=[sigMin,sigMax];
     allExtr=abs(allExtr(extrOrd));%sort local extrema absolute values according ot their order of appearence
-
+        
     refSig= interp1(tExtr,allExtr,newIdxs, 'pchip'); %interpolate local extrema absolute values
+% 
+%     if tMin(1)<tMax(1)
+%         extr1=tMin;
+%         extr2=tMax;
+%         extrSig=sigIn;
+%     else
+%         extr1=tMax;
+%         extr2=tMin;
+%         extrSig=-sigIn;
+%     end
+%     Bnds=[extr1(1:end-1),extr1(2:end)];
+%     sigInOrig=sigIn;
+%     for i=1:size(Bnds,1)
+       
+%         sigIn(Bnds(i,1):Bnds(i,2))=sigIn(Bnds(i,1):Bnds(i,2))./refSig(Bnds(i,1):Bnds(i,2));  
+%     end
 
 	iter_val = abs(sum(refSig) - max(size(refSig))) ; % compute mean difference between envelopes values from last two iterations
     sigIn=sigIn./refSig;% normalize signal's amplitude
