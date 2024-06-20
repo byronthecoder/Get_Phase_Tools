@@ -649,9 +649,9 @@ def getPhaseMask(sigIn,sr,m=16,n=5,nMasks=22,ampCoeff=2, quadMethod=['h','h'], t
         PHI=co_distproto(embedding,NV )[0]
         PHI =wrapTo2Pi(PHI-shiftAngle);
     else:
-        raise('only methods avialable to get the phase are Hilbert: \
+        raise(Exception('only methods avialable to get the phase are Hilbert: \
               ''h'', direct quadrature based: ''q'', based on direct quadrature with interpolation around zero crossing: ''qs''\
-              or curve length and direct quad. based ''cl''')
+              or curve length and direct quad. based ''cl'''))
 
     
     sigFreq = get_omega(PHI,sr,m,n)
@@ -678,9 +678,9 @@ def getPhaseMask(sigIn,sr,m=16,n=5,nMasks=22,ampCoeff=2, quadMethod=['h','h'], t
         newPHI=co_distproto(embedding,NV )[0]
         newPHI =wrapTo2Pi(newPHI-shiftAngle)
     else:
-        raise('only methods avialable to get the phase are Hilbert: \
+        raise(Exception('only methods avialable to get the phase are Hilbert: \
               ''h'', direct quadrature based: ''q'', based on direct quadrature with interpolation around zero crossing: ''qs''\
-              or curve length and direct quad. based ''cl''')
+              or curve length and direct quad. based ''cl'''))
     return newPHI, IMF1, PHI, centredSig,mask
 
 # 
