@@ -3,6 +3,7 @@ channels:
 dependencies:
   - scipy>=1.10.1
   - numpy>=1.25.0
+  - matplotlib>=3.9.2
   - pip
   - pip:
       - emd-signal>=1.5.1

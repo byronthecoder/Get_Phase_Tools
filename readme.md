@@ -49,6 +49,10 @@ conda env update --name [envname] --file requirements.yml
 
 where **[envname]** should be substituted by the name of the environment where you want to use Get Phase Tools.
 
+Update (08/09/2024): in order to use the package with numpy versions >=2, you should change line 12 of getPhaseToolsM.py
+from 'from PyEMD import EMD_matlab as EMDm' to 'from PyEMD import EMD_matlab_LL as EMDm'.
+
+
 # Usage: 
 The scripts are accessible via two main functions having the same names and arguments in both Matlab and Python implementations: 
 **getPhaseMask** and **mEMDdenoise**. Their functioning is illustrated by the two demo files **paper_example_application.mlx** (Matlab Live Editor)
