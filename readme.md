@@ -95,7 +95,7 @@ the function's outputs are:
 
 # Copyright
 
-This code is licensed under the GNU-GPL (see LICENSE file). If you use it, you have to refer to the companion paper avialable here: https://doi.org/10.1101/2023.11.01.564135  
+This code is licensed under the GNU-GPL (see LICENSE file). If you use it, you have to refer to the companion paper avialable here: https://doi.org/10.1016/j.humov.2024.103249 
 
 # References  
 
