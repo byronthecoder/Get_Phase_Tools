@@ -3,7 +3,7 @@ Code to extract the continuous instantaneous phase of experimental signals accor
 
 Instantaneous phase of rhythmic behaviour under volitional control  
 Leonardo Lancia  
-bioRxiv 2023.11.01.564135; doi: https://doi.org/10.1101/2023.11.01.564135
+Human Movement Science,Volume 96,2024,103249; doi: https://doi.org/10.1016/j.humov.2024.103249
 
 ## Content:
 
