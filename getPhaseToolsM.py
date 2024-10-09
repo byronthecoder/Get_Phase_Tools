@@ -25,7 +25,6 @@ def interp_NAN(X,method='linear'):
     """
     interpolate NAN vales according to the method in the second argument
     this can be either pchip or whatever method accepted by scipy interp1d
-    method can be either 'linear' or 'pchip'
     """ 
     newX=copy.copy(X)
     mynans=np.isnan(newX)
@@ -86,7 +85,7 @@ def demodulateAmp(sig,symmetric=1,threshNorm=1e-10,maxIterN=5,symN=2):
         emdObj = EMDm.EMD()
         emdObj.MAX_ITERATION=2
         emdObj.FIXE = 1
-        normSig=emdObj.emd(normSig,maxImf=2)[0]
+        normSig=emdObj.emd(emdObj,normSig,maxImf=2)[0]
         # normSig,_=emd.sift.get_next_imf(normSig,
         #         stop_method='rilling',max_iters=1000)
         #tmpIMFs=emdObj(resid+m[:, nn])
@@ -163,7 +162,7 @@ def do_mask_sift(resid,CF=None,nMasks=4,ampCoeff=None,frqEst='phi',emdObj=None):
         emdObj1 = EMDm.EMD()
         emdObj1.MAX_ITERATION=1
         
-        IMF0=emdObj1.emd(resid,maxImf=2)[0][0]
+        IMF0=emdObj1.emd(emdObj1,resid,maxImf=2)[0][0]
         IMF0=demodulateAmp(IMF0) # refined amplitude normalization
         if frqEst=='phi':           # if frequency is to be estimated via phase derivative
             IPH=np.angle(signal.hilbert(IMF0)) # phase
@@ -187,7 +186,7 @@ def do_mask_sift(resid,CF=None,nMasks=4,ampCoeff=None,frqEst='phi',emdObj=None):
     for nn in np.arange(nMasks):
         # tmpIMFs,_=emd.sift.get_next_imf(resid+m[:, nn],
         #         stop_method='rilling', rilling_thresh=[0.05,0.5,0.05],max_iters=1000)
-        tmpIMFs=emdObj.emd(resid+m[:, nn],maxImf=2)[0]
+        tmpIMFs=emdObj.emd(emdObj,resid+m[:, nn],maxImf=2)[0]
         IMFs[:,nn]=tmpIMFs[0]#[:,0]#
         
     return np.sum(IMFs - m,axis=1)/nMasks, CF, m[:, 0]
@@ -430,7 +429,7 @@ def get_omega(PHIin,sr,m=16,n=5):
 
 def maskEMD(sigIn,sr, maxIMFn=10,nMasks=22,ampCoeff=2,m=16,n=5,stdRatioThresh=1e-6):
     """
-    masked EMDm.EMD
+    masked EMD
     
     input:
          signal: input signal
@@ -465,7 +464,7 @@ def maskEMD(sigIn,sr, maxIMFn=10,nMasks=22,ampCoeff=2,m=16,n=5,stdRatioThresh=1e
     while nPks>0 and nn <maxIMFn-1 and stdRatio>stdRatioThresh:
         
 
-        myMode=emdObj.emd(resid,maxImf=2)[0]
+        myMode=emdObj.emd(emdObj,resid,maxImf=2)[0]
         # myMode,_=emd.sift.get_next_imf(resid,
         #         stop_method='fixed', max_iters=1)
         myMode=myMode[0]#[:,0]
@@ -511,7 +510,8 @@ def maskEMD(sigIn,sr, maxIMFn=10,nMasks=22,ampCoeff=2,m=16,n=5,stdRatioThresh=1e
 
 def mEMDdenoise(data,sr,nMasks=22,ampCoeff=2,alpha=0.05,nReps=100,m=16,n=5):
     """
-    remove noise from signal in Data sampled at freq. sr 
+    remove noise from signal in Data sampled at freq. sr and get instantaneous phase
+    
     input:
        data: input signal
        sr (positive real): sampling rate
@@ -560,7 +560,7 @@ def mEMDdenoise(data,sr,nMasks=22,ampCoeff=2,alpha=0.05,nReps=100,m=16,n=5):
     #emdObj.FIXE = nImf-1
     
     for i in np.arange(np.shape(noiseLev)[0]):
-       rndImfs=emdObj.emd(f[:,i])[0]# apply EMD
+       rndImfs=emdObj.emd(emdObj,f[:,i])[0]# apply EMD
        rndImfsArr=np.empty((np.size(rndImfs[0]),len(rndImfs)))# need to transform the dictionary into an array
        for h in rndImfs.keys():
            rndImfsArr[:,h]=rndImfs[h]
@@ -590,7 +590,8 @@ def mEMDdenoise(data,sr,nMasks=22,ampCoeff=2,alpha=0.05,nReps=100,m=16,n=5):
     
 def getPhaseMask(sigIn,sr,m=16,n=5,nMasks=22,ampCoeff=2, quadMethod=['h','h'], threshs=[1e-10,1e-10],sndCorrSp=0):
     """
-   performs EMD via Masked Sifting
+    Extract instantaneous phase of signal sigIn sampled at sr Hz.
+    
     input: 
         sigIn: input signal
         sr: sampling rate
@@ -629,7 +630,7 @@ def getPhaseMask(sigIn,sr,m=16,n=5,nMasks=22,ampCoeff=2, quadMethod=['h','h'], t
     emdObj = EMDm.EMD()
     emdObj.MAX_ITERATION=2
     emdObj.FIXE = 1
-    IMF0=emdObj.emd(sigIn,maxImf=2)[0]
+    IMF0=emdObj.emd(emdObj,sigIn,maxImf=2)[0]
     #
     # IMF0,_=emd.sift.get_next_imf(sigIn,
     #          stop_method='fixed', max_iters=1)

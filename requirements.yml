@@ -6,6 +6,6 @@ dependencies:
   - matplotlib>=3.9.2
   - pip
   - pip:
-      - emd-signal>=1.5.1
+      - emd-signal>=1.6.4
       - stochastic>=0.6.0
       - hurst>=0.0.5

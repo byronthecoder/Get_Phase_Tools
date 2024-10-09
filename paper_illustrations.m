@@ -106,7 +106,7 @@ txtY=1.8;
 text(txtX,txtY,'(c)','FontSize',fSize);
 
 axes(ha(6));
-plot(demodulateAmp([(y+y1+y2)-meanEnv]'),'k')
+plot(demodulateAmp0([(y+y1+y2)-meanEnv]'),'k')
 ylim([-1.8,1.8])
 txtY=1.5;
 text(txtX,txtY,'(d)','FontSize',fSize);
@@ -117,7 +117,7 @@ print('./figures/fig_2','-dtiff', '-r600')
 
 
 Decomp=emd([y+y1+y2]');
-normSig=demodulateAmp(Decomp(1,:)');%Huang normalizatin algo
+normSig=demodulateAmp0(Decomp(1,:)');%Huang normalizatin algo
 
 figure;
 % tight_subplot(6,3,[0.04,0.05],0.08)
@@ -178,8 +178,8 @@ nMasks=16;
 YY=y+y1+y2+0.2*yOnOff;
 
 Decomp=emd(YY)';
-normSig=demodulateAmp(Decomp(:,1));%Huang normalizatin algo
-normSig1=demodulateAmp(Decomp(:,2));%Huang normalizatin algo
+normSig=demodulateAmp(Decomp(:,1));%Huang normalization algo
+normSig1=demodulateAmp(Decomp(:,2));%Huang normalization algo
 figure;
 [ha, pos] = tight_subplot(6,3,[0.04,0.05],0.08);
 plotNums=[1,4,7,10,13];

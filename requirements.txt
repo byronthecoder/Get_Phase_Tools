@@ -1,5 +1,5 @@
 numpy>=1.25.0
-EMD-signal>=1.5.1
+EMD-signal>=1.6.4
 scipy>=1.10.1
 matplotlib>=3.9.2
 stochastic>=0.6.0
